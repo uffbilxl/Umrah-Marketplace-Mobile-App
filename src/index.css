@@ -75,6 +75,13 @@
     -webkit-font-smoothing: antialiased;
     line-height: 1.6;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  input, textarea, select, button {
+    user-select: auto;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-header);
@@ -155,4 +162,29 @@
 /* Safe area padding for mobile */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Native app feel */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth scroll for the whole app */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent pull-to-refresh on mobile */
+html, body {
+  overscroll-behavior: none;
+}
+
+/* Status bar safe area for notched phones */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
 }
