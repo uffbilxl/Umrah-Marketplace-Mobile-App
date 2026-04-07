@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import Preloader from '@/components/Preloader';
+import MobileHeader from '@/components/MobileHeader';
+import BottomTabBar from '@/components/BottomTabBar';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const dealsList = [
   { id: 1, title: 'Lamb Leg Whole', badge: 'Double Deal', desc: 'Premium whole lamb leg, 100% Halal.', price: '£8.99/kg', original: '£11.99/kg', img: 'https://images.unsplash.com/photo-1588347818036-558601350947?w=600&q=80' },
@@ -20,6 +20,7 @@ const filters = ['All', 'Double Deal', 'Mega Pack', 'Save %', 'U Points Bonus'];
 const DealsPage = () => {
   const [filter, setFilter] = useState('All');
   const [countdown, setCountdown] = useState({ d: 0, h: 0, m: 0, s: 0 });
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = 'Deals & Offers | Umrah Supermarket';
@@ -49,74 +50,76 @@ const DealsPage = () => {
 
   return (
     <>
-      <Preloader /><Navbar />
-      <main className="min-h-screen">
-        {/* Featured deal hero */}
-        <section className="bg-umrah-black pt-28 pb-16">
-          <div className="container-umrah">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="rounded-lg overflow-hidden h-[300px] lg:h-[400px]">
-                <img src={featured.img} alt={featured.title} className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <span className="inline-block bg-secondary px-4 py-1.5 rounded text-xs font-bold text-umrah-black tracking-[0.1em] uppercase mb-4">Featured Deal</span>
-                <h1 className="font-header text-3xl lg:text-4xl text-umrah-white uppercase tracking-[0.08em] mb-4">{featured.title}</h1>
-                <p className="text-umrah-white/50 mb-6">{featured.desc}</p>
-                <div className="flex items-baseline gap-3 mb-8">
-                  <span className="font-header text-4xl text-secondary">{featured.price}</span>
-                  {featured.original && <span className="text-lg text-umrah-white/30 line-through">{featured.original}</span>}
-                </div>
-                {/* Countdown */}
-                <div className="flex gap-4 mb-8">
-                  {[{ v: countdown.d, l: 'Days' }, { v: countdown.h, l: 'Hours' }, { v: countdown.m, l: 'Mins' }, { v: countdown.s, l: 'Secs' }].map(t => (
-                    <div key={t.l} className="text-center">
-                      <div className="font-header text-2xl text-umrah-white bg-umrah-dark-gray w-14 h-14 rounded-lg flex items-center justify-center mb-1">{String(t.v).padStart(2, '0')}</div>
-                      <div className="text-[0.6rem] text-umrah-white/40 uppercase tracking-wider">{t.l}</div>
-                    </div>
-                  ))}
-                </div>
-                <Link to="/shop" className="inline-flex items-center gap-2 bg-secondary text-umrah-black px-8 py-3.5 rounded-[2px] text-sm font-bold tracking-[0.15em] uppercase hover:bg-umrah-white transition-all">
-                  Shop This Deal <i className="fas fa-arrow-right" />
-                </Link>
+      <MobileHeader />
+      <main className="pt-20 pb-24 min-h-screen bg-background">
+        <div className="px-5">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+
+          <h1 className="font-header text-2xl tracking-[0.08em] uppercase mb-5">Deals & Offers</h1>
+
+          {/* Featured deal */}
+          <div className="rounded-2xl overflow-hidden mb-5 relative h-[200px]">
+            <img src={featured.img} alt={featured.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
+            <div className="absolute top-3 left-3 bg-secondary px-3 py-1 rounded text-xs font-bold text-secondary-foreground tracking-wider uppercase">
+              Featured Deal
+            </div>
+            <div className="absolute bottom-4 left-4 right-4">
+              <h2 className="font-header text-xl uppercase text-foreground mb-1">{featured.title}</h2>
+              <div className="flex items-baseline gap-2">
+                <span className="font-header text-2xl text-secondary">{featured.price}</span>
+                {featured.original && <span className="text-sm text-muted-foreground line-through">{featured.original}</span>}
               </div>
             </div>
           </div>
-        </section>
 
-        {/* Filter tabs */}
-        <section className="py-16 bg-muted">
-          <div className="container-umrah">
-            <div className="flex flex-wrap gap-3 mb-10">
-              {filters.map(f => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-5 py-2 rounded-[2px] text-xs font-semibold tracking-[0.1em] uppercase transition-all ${filter === f ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground hover:bg-primary/10'}`}>
-                  {f}
-                </button>
-              ))}
-            </div>
+          {/* Countdown */}
+          <div className="flex gap-3 justify-center mb-6">
+            {[{ v: countdown.d, l: 'Days' }, { v: countdown.h, l: 'Hrs' }, { v: countdown.m, l: 'Min' }, { v: countdown.s, l: 'Sec' }].map(t => (
+              <div key={t.l} className="text-center">
+                <div className="font-header text-xl text-foreground bg-card w-14 h-14 rounded-xl flex items-center justify-center mb-1 border border-border">
+                  {String(t.v).padStart(2, '0')}
+                </div>
+                <div className="text-[0.55rem] text-muted-foreground uppercase tracking-wider">{t.l}</div>
+              </div>
+            ))}
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filtered.map(deal => (
-                <div key={deal.id} className="bg-card rounded-lg overflow-hidden hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] transition-all group">
-                  <div className="h-60 relative overflow-hidden">
-                    <img src={deal.img} alt={deal.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-umrah-black/50" />
-                    <div className="absolute top-4 left-4 bg-secondary px-3 py-1.5 rounded text-[0.7rem] font-bold text-umrah-black tracking-[0.1em] uppercase z-10">{deal.badge}</div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-header text-base tracking-[0.05em] uppercase mb-2">{deal.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{deal.desc}</p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-header text-xl text-primary">{deal.price}</span>
-                      {deal.original && <span className="text-sm text-muted-foreground line-through">{deal.original}</span>}
-                    </div>
+          {/* Filter chips */}
+          <div className="flex gap-2 overflow-x-auto pb-3 mb-5 scrollbar-hide">
+            {filters.map(f => (
+              <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wider whitespace-nowrap transition-all ${filter === f ? 'bg-secondary text-secondary-foreground' : 'bg-card text-muted-foreground border border-border'}`}>
+                {f}
+              </button>
+            ))}
+          </div>
+
+          {/* Deal cards */}
+          <div className="space-y-3">
+            {filtered.map(deal => (
+              <div key={deal.id} className="bg-card rounded-xl overflow-hidden flex gap-4 p-3">
+                <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 relative">
+                  <img src={deal.img} alt={deal.title} className="w-full h-full object-cover" />
+                  <div className="absolute top-1 left-1 bg-secondary px-1.5 py-0.5 rounded text-[0.5rem] font-bold text-secondary-foreground tracking-wider uppercase">
+                    {deal.badge}
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-foreground truncate mb-0.5">{deal.title}</h3>
+                  <p className="text-xs text-muted-foreground mb-2">{deal.desc}</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-header text-lg text-secondary">{deal.price}</span>
+                    {deal.original && <span className="text-xs text-muted-foreground line-through">{deal.original}</span>}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
       </main>
-      <Footer />
+      <BottomTabBar />
     </>
   );
 };
