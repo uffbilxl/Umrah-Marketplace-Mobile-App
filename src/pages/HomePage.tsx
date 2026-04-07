@@ -65,36 +65,37 @@ const HomePage = () => {
         </div>
 
         {/* Hero tiles left - desktop only */}
-        <div className="hidden xl:flex absolute left-12 top-1/2 -translate-y-1/2 z-10 flex-col gap-4">
+        <div className="hidden xl:flex absolute left-12 top-[28%] z-10 flex-col gap-4">
           {[
             { src: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80', alt: 'Fresh bakery' },
             { src: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=80', alt: 'Drinks selection' },
+            { src: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=400&q=80', alt: 'Sauces' },
           ].map((tile, i) => (
-            <div key={i} className={`w-[160px] h-[110px] rounded-lg overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.4)] border-2 border-umrah-white/[0.08] hover:scale-105 hover:border-secondary transition-all ${i === 0 ? 'ml-6' : ''}`}>
+            <div key={i} className={`w-[155px] h-[105px] rounded-lg overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.4)] border-2 border-umrah-white/[0.08] hover:scale-105 hover:border-secondary transition-all ${i === 1 ? 'ml-8' : ''}`}>
               <img src={tile.src} alt={tile.alt} className="w-full h-full object-cover" loading="lazy" />
             </div>
           ))}
         </div>
 
         {/* Hero tiles right - desktop only */}
-        <div className="hidden xl:flex absolute right-12 top-1/2 -translate-y-1/2 z-10 flex-col gap-4">
+        <div className="hidden xl:flex absolute right-12 top-[28%] z-10 flex-col gap-4">
           {[
             { src: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80', alt: 'Fresh halal meat' },
             { src: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=80', alt: 'Fresh produce' },
             { src: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80', alt: 'Spices' },
           ].map((tile, i) => (
-            <div key={i} className={`w-[160px] h-[110px] rounded-lg overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.4)] border-2 border-umrah-white/[0.08] hover:scale-105 hover:border-secondary transition-all ${i === 1 ? 'ml-8' : ''}`}>
+            <div key={i} className={`w-[155px] h-[105px] rounded-lg overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.4)] border-2 border-umrah-white/[0.08] hover:scale-105 hover:border-secondary transition-all ${i === 1 ? 'ml-8' : ''}`}>
               <img src={tile.src} alt={tile.alt} className="w-full h-full object-cover" loading="lazy" />
             </div>
           ))}
         </div>
 
-        {/* Stats - centered */}
-        <div className="hidden md:flex absolute bottom-16 left-1/2 -translate-x-1/2 gap-16 z-10">
+        {/* Stats - centered at bottom */}
+        <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 gap-16 z-10">
           {[{ n: '7+', l: 'Stores UK Wide' }, { n: '5K+', l: 'Products' }, { n: '100%', l: 'Halal Certified' }].map(s => (
             <div key={s.l} className="text-center">
-              <div className="font-header text-[2.5rem] text-secondary leading-none mb-1.5">{s.n}</div>
-              <div className="text-[0.7rem] text-umrah-white/50 tracking-[0.2em] uppercase">{s.l}</div>
+              <div className="font-header text-[2rem] text-secondary leading-none mb-1">{s.n}</div>
+              <div className="text-[0.65rem] text-umrah-white/50 tracking-[0.2em] uppercase">{s.l}</div>
             </div>
           ))}
         </div>
