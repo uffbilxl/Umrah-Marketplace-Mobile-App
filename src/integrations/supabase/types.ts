@@ -14,7 +14,152 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          brand: string | null
+          category: string
+          created_at: string | null
+          id: number
+          image_url: string | null
+          in_stock: boolean
+          member_discount: number
+          name: string
+          price: number
+          weight: string | null
+        }
+        Insert: {
+          brand?: string | null
+          category: string
+          created_at?: string | null
+          id?: never
+          image_url?: string | null
+          in_stock?: boolean
+          member_discount?: number
+          name: string
+          price: number
+          weight?: string | null
+        }
+        Update: {
+          brand?: string | null
+          category?: string
+          created_at?: string | null
+          id?: never
+          image_url?: string | null
+          in_stock?: boolean
+          member_discount?: number
+          name?: string
+          price?: number
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          phone_number: string | null
+          points: number
+          preferred_store_location: string | null
+          tier: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+          name: string
+          phone_number?: string | null
+          points?: number
+          preferred_store_location?: string | null
+          tier?: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          phone_number?: string | null
+          points?: number
+          preferred_store_location?: string | null
+          tier?: string
+        }
+        Relationships: []
+      }
+      purchase_items: {
+        Row: {
+          id: number
+          product_id: number
+          purchase_id: number
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          id?: never
+          product_id: number
+          purchase_id: number
+          quantity?: number
+          unit_price: number
+        }
+        Update: {
+          id?: never
+          product_id?: number
+          purchase_id?: number
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchases: {
+        Row: {
+          date: string
+          id: number
+          points_earned: number
+          store_location: string | null
+          total_spent: number
+          user_id: string
+        }
+        Insert: {
+          date?: string
+          id?: never
+          points_earned?: number
+          store_location?: string | null
+          total_spent: number
+          user_id: string
+        }
+        Update: {
+          date?: string
+          id?: never
+          points_earned?: number
+          store_location?: string | null
+          total_spent?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
