@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Preloader from "@/components/Preloader";
+import DecorativeStrip from "@/components/DecorativeStrip";
 import HomePage from "./pages/HomePage";
 import SearchPage from "./pages/SearchPage";
 import RewardsPage from "./pages/RewardsPage";
@@ -24,6 +25,8 @@ const App = () => (
     <TooltipProvider>
       <Sonner />
       <Preloader />
+      <DecorativeStrip position="top" />
+      <DecorativeStrip position="bottom" />
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
