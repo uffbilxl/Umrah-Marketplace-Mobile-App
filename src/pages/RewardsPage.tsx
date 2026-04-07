@@ -128,6 +128,15 @@ const RewardsPage = () => {
                 <button type="submit" disabled={submitting} className="w-full bg-secondary text-secondary-foreground py-3.5 rounded-xl text-sm font-bold tracking-[0.1em] uppercase disabled:opacity-50">
                   {submitting ? 'Signing In...' : 'Sign In'}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginForm({ email: 'demo@umrahsupermarket.co.uk', password: 'UmrahDemo2026!' });
+                  }}
+                  className="w-full text-xs text-secondary font-semibold py-2"
+                >
+                  Use Demo Account
+                </button>
               </form>
             )}
           </div>
