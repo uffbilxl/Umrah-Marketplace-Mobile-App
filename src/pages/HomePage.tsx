@@ -149,7 +149,7 @@ const HomePage = () => {
 
           <div className="flex gap-3 overflow-x-auto pb-3 mb-8 scrollbar-hide">
             {dealsList.map(deal => (
-              <div key={deal.id} className="bg-card rounded-xl overflow-hidden flex-shrink-0 w-[180px]">
+              <div key={deal.id} className="bg-card rounded-xl overflow-hidden flex-shrink-0 w-[180px] hover:scale-[1.03] transition-transform duration-200">
                 <div className="h-[120px] relative overflow-hidden">
                   <img src={deal.img} alt={deal.title} className="w-full h-full object-cover" />
                   <div className="absolute top-2 left-2 bg-secondary px-2 py-0.5 rounded text-[0.55rem] font-bold text-secondary-foreground tracking-wider uppercase">
@@ -184,7 +184,7 @@ const HomePage = () => {
                     : null;
 
                   return (
-                    <div key={product.id} className="bg-card rounded-xl overflow-hidden">
+                    <div key={product.id} className="bg-card rounded-xl overflow-hidden hover:scale-[1.03] transition-transform duration-200">
                       <Link to={`/product/${product.id}`}>
                         <div className="h-[120px] overflow-hidden relative">
                           <img src={product.image_url || '/placeholder.svg'} alt={product.name} className="w-full h-full object-cover" />

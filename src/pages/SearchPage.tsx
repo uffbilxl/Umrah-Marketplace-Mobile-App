@@ -100,10 +100,10 @@ const SearchPage = () => {
               const memberPrice = user && product.member_discount > 0
                 ? product.price * (1 - product.member_discount / 100)
                 : null;
-              const pts = Math.floor(product.price * 10);
+              const pts = Math.floor(product.price);
 
               return (
-                <div key={product.id} className="bg-card rounded-xl p-3 flex gap-4 items-center">
+                <div key={product.id} className="bg-card rounded-xl p-3 flex gap-4 items-center hover:bg-accent/50 transition-all duration-200">
                   <Link to={`/product/${product.id}`} className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                     <img
                       src={product.image_url || '/placeholder.svg'}
