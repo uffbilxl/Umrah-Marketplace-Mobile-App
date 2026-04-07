@@ -46,20 +46,22 @@ const ProfilePage = () => {
     }
   }, [profile]);
 
+  const fetchProfileData = async () => {
+    if (!user) return;
+    setOrdersLoading(true);
+    const [orderRes, voucherRes] = await Promise.all([
+      supabase.from('purchases').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+      supabase.from('vouchers').select('*').eq('user_id', user.id).eq('used', false).order('created_at', { ascending: false }),
+    ]);
+    const data = orderRes.data || [];
+    setOrders(data);
+    setOrdersLoading(false);
+    if (data.length > 0) setExpandedOrder(data[0].id);
+    setVouchers(voucherRes.data || []);
+  };
+
   useEffect(() => {
-    if (user) {
-      setOrdersLoading(true);
-      supabase
-        .from('purchases')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .then(({ data }) => {
-          setOrders(data || []);
-          setOrdersLoading(false);
-          if (data && data.length > 0) setExpandedOrder(data[0].id);
-        });
-    }
+    fetchProfileData();
   }, [user]);
 
   const handleSaveDetails = async () => {
