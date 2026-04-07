@@ -44,7 +44,6 @@ const Navbar = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
-    const { toast } = await import('sonner');
     toast.info("You've been signed out");
   };
 
