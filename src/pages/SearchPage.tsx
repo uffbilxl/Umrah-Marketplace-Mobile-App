@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import BottomTabBar from '@/components/BottomTabBar';
 import { toast } from 'sonner';
+import MobileHeader from '@/components/MobileHeader';
 import { Search, SlidersHorizontal, Star, ShoppingCart } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Fresh Halal Meat', 'Frozen Foods', 'Sauces', 'Masalas & Spices', 'Drinks', 'Fresh Produce', 'Bakery'];
@@ -43,7 +44,8 @@ const SearchPage = () => {
 
   return (
     <>
-      <main className="pt-6 pb-24 min-h-screen bg-background">
+      <MobileHeader />
+      <main className="pt-20 pb-24 min-h-screen bg-background">
         <div className="px-5">
           <h1 className="font-header text-2xl tracking-[0.08em] uppercase mb-5">
             Search products
