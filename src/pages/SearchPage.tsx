@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import BottomTabBar from '@/components/BottomTabBar';
 import { toast } from 'sonner';
+import MobileHeader from '@/components/MobileHeader';
 import { Search, SlidersHorizontal, Star, ShoppingCart } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Fresh Halal Meat', 'Frozen Foods', 'Sauces', 'Masalas & Spices', 'Drinks', 'Fresh Produce', 'Bakery'];
