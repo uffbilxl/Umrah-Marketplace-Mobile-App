@@ -21,6 +21,7 @@ const UPointsPage = () => {
   const [purchases, setPurchases] = useState<any[]>([]);
   const [purchaseCount, setPurchaseCount] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
+  const [vouchers, setVouchers] = useState<any[]>([]);
 
   useEffect(() => {
     document.title = 'U Points Loyalty | Umrah Supermarket';
