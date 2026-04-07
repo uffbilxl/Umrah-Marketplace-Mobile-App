@@ -21,14 +21,8 @@ const Preloader = () => {
         <img
           src="/images/umrah_logo.png"
           alt="Umrah Supermarket"
-          className="h-20 w-auto object-contain mb-6 animate-[fadeInScale_0.8s_ease_forwards]"
+          className="h-24 w-auto object-contain mb-8 animate-[fadeInScale_0.8s_ease_forwards]"
         />
-        <div className="font-header text-[2rem] text-secondary tracking-[0.15em] uppercase mb-1 animate-[fadeInUp_0.6s_0.3s_ease_both]">
-          Umrah
-        </div>
-        <div className="text-xs text-muted-foreground tracking-[0.3em] lowercase mb-8 animate-[fadeInUp_0.6s_0.5s_ease_both]">
-          supermarket
-        </div>
         <div className="w-[180px] h-[2px] bg-muted rounded overflow-hidden animate-[fadeInUp_0.6s_0.7s_ease_both]">
           <div className="h-full bg-secondary rounded animate-[preloaderBar_1.8s_ease_forwards]" style={{ width: 0 }} />
         </div>
