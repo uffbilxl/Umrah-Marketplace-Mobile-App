@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBasket, User, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { toast } from 'sonner';
 import AuthModal from '@/components/AuthModal';
 
 const Navbar = () => {
