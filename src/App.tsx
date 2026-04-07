@@ -5,17 +5,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import HomePage from "./pages/HomePage";
-import ShopPage from "./pages/ShopPage";
-import ProductDetailPage from "./pages/ProductDetailPage";
-import UPointsPage from "./pages/UPointsPage";
-import StoresPage from "./pages/StoresPage";
-import AboutPage from "./pages/AboutPage";
-import DealsPage from "./pages/DealsPage";
-import CartPage from "./pages/CartPage";
+import SearchPage from "./pages/SearchPage";
+import RewardsPage from "./pages/RewardsPage";
 import ProfilePage from "./pages/ProfilePage";
+import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import NotFound from "./pages/NotFound";
-import Preloader from "./components/Preloader";
 
 const queryClient = new QueryClient();
 
@@ -26,17 +21,12 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
-            <Preloader />
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/product/:id" element={<ProductDetailPage />} />
-              <Route path="/upoints" element={<UPointsPage />} />
-              <Route path="/stores" element={<StoresPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/deals" element={<DealsPage />} />
-              <Route path="/cart" element={<CartPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/rewards" element={<RewardsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
