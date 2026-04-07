@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import MobileHeader from '@/components/MobileHeader';
 import BottomTabBar from '@/components/BottomTabBar';
+import AuthModal from '@/components/AuthModal';
 import { toast } from 'sonner';
 import { Loader2, Settings, ChevronRight, LogOut, User, Lock, MapPin, Phone } from 'lucide-react';
 import patternRight from '@/assets/pattern-right.png';
@@ -26,12 +27,9 @@ const ProfilePage = () => {
   const [changingPass, setChangingPass] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => { document.title = 'Profile | Umrah Supermarket'; }, []);
-
-  useEffect(() => {
-    if (!authLoading && !user) navigate('/rewards');
-  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     if (profile) {
@@ -77,11 +75,35 @@ const ProfilePage = () => {
     setNewPass(''); setConfirmPass('');
   };
 
-  if (authLoading || !profile) {
+  if (authLoading) {
     return (
       <>
+        <MobileHeader />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-secondary" />
+        </main>
+        <BottomTabBar />
+      </>
+    );
+  }
+
+  if (!user || !profile) {
+    return (
+      <>
+        <MobileHeader />
+        <main className="pt-20 pb-24 min-h-screen bg-background flex flex-col items-center justify-center px-5">
+          <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
+            <User className="w-8 h-8 text-secondary" />
+          </div>
+          <h1 className="font-header text-xl tracking-[0.08em] uppercase mb-2">My Account</h1>
+          <p className="text-sm text-muted-foreground text-center mb-6">Sign in to view your profile, order history and U Points balance.</p>
+          <button
+            onClick={() => setShowAuth(true)}
+            className="bg-secondary text-secondary-foreground px-8 py-3 rounded-xl text-sm font-bold tracking-wider uppercase"
+          >
+            Sign In or Register
+          </button>
+          <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
         </main>
         <BottomTabBar />
       </>
