@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import Preloader from '@/components/Preloader';
+import MobileHeader from '@/components/MobileHeader';
+import BottomTabBar from '@/components/BottomTabBar';
+import { toast } from 'sonner';
+import { ArrowLeft, Star, ShoppingCart, Loader2 } from 'lucide-react';
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<any>(null);
   const [related, setRelated] = useState<any[]>([]);
   const [qty, setQty] = useState(1);
@@ -31,100 +33,128 @@ const ProductDetailPage = () => {
     fetch();
   }, [id]);
 
-  if (loading) return <><Preloader /><Navbar /><div className="pt-32 pb-20 text-center min-h-screen">Loading...</div><Footer /></>;
-  if (!product) return <><Preloader /><Navbar /><div className="pt-32 pb-20 text-center min-h-screen">Product not found.</div><Footer /></>;
+  if (loading) {
+    return (
+      <>
+        <MobileHeader />
+        <main className="pt-20 pb-24 min-h-screen bg-background flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-secondary" />
+        </main>
+        <BottomTabBar />
+      </>
+    );
+  }
+
+  if (!product) {
+    return (
+      <>
+        <MobileHeader />
+        <main className="pt-20 pb-24 min-h-screen bg-background flex flex-col items-center justify-center px-5">
+          <h1 className="font-header text-xl tracking-[0.08em] uppercase mb-2">Product Not Found</h1>
+          <Link to="/search" className="text-sm text-secondary font-semibold">Back to Search</Link>
+        </main>
+        <BottomTabBar />
+      </>
+    );
+  }
 
   const memberPrice = user && product.member_discount > 0 ? product.price * (1 - product.member_discount / 100) : null;
   const pts = Math.floor(product.price * 10);
 
   return (
     <>
-      <Preloader />
-      <Navbar />
-      <main className="pt-28 pb-20 min-h-screen bg-background">
-        <div className="container-umrah">
-          {/* Breadcrumb */}
-          <div className="mb-8 text-sm text-muted-foreground">
-            <Link to="/shop" className="hover:text-primary transition-colors">Shop</Link>
-            <span className="mx-2">/</span>
-            <Link to={`/shop?category=${encodeURIComponent(product.category)}`} className="hover:text-primary transition-colors">{product.category}</Link>
-            <span className="mx-2">/</span>
-            <span className="text-foreground">{product.name}</span>
+      <MobileHeader />
+      <main className="pt-20 pb-24 min-h-screen bg-background">
+        <div className="px-5">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+
+          {/* Product image */}
+          <div className="rounded-2xl overflow-hidden h-[280px] mb-5 relative">
+            <img src={product.image_url || '/placeholder.svg'} alt={product.name} className="w-full h-full object-cover" />
+            {product.brand && (
+              <div className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm text-foreground text-xs px-3 py-1 rounded-full font-medium">
+                {product.brand}
+              </div>
+            )}
+            {!product.in_stock && (
+              <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                <span className="text-foreground font-bold tracking-wider uppercase text-sm">Out of Stock</span>
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-            {/* Image */}
-            <div className="lg:col-span-3">
-              <div className="rounded-lg overflow-hidden aspect-[4/3]">
-                <img src={product.image_url || '/placeholder.svg'} alt={product.name} className="w-full h-full object-cover" />
-              </div>
-            </div>
+          {/* Details */}
+          <h1 className="font-header text-2xl tracking-[0.05em] uppercase mb-1">{product.name}</h1>
+          <p className="text-sm text-muted-foreground mb-3">{product.category} {product.weight && `· ${product.weight}`}</p>
 
-            {/* Details */}
-            <div className="lg:col-span-2">
-              {product.brand && <span className="text-sm text-muted-foreground tracking-[0.1em] uppercase">{product.brand}</span>}
-              <h1 className="font-header text-3xl tracking-[0.05em] uppercase mt-2 mb-2">{product.name}</h1>
-              <p className="text-sm text-muted-foreground mb-1">{product.category} · {product.weight}</p>
-              
-              <div className="mt-6 mb-4">
-                {memberPrice ? (
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-header text-3xl text-primary">£{memberPrice.toFixed(2)}</span>
-                    <span className="text-lg text-muted-foreground line-through">£{product.price.toFixed(2)}</span>
-                    <span className="bg-primary/10 text-primary text-xs font-semibold px-2.5 py-1 rounded">Member Price</span>
-                  </div>
-                ) : (
-                  <span className="font-header text-3xl text-foreground">£{product.price.toFixed(2)}</span>
-                )}
-              </div>
-
-              <div className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-2 rounded mb-8">
-                <i className="fas fa-star text-sm" />
-                <span className="text-sm font-semibold">Earn {pts} pts with this purchase</span>
-              </div>
-
-              {/* Qty + Add */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center border border-border rounded">
-                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2 text-lg hover:bg-muted transition-colors">−</button>
-                  <span className="px-4 py-2 text-sm font-semibold">{qty}</span>
-                  <button onClick={() => setQty(qty + 1)} className="px-4 py-2 text-lg hover:bg-muted transition-colors">+</button>
-                </div>
-                <button
-                  onClick={() => addItem({ product_id: product.id, name: product.name, price: memberPrice || product.price, image_url: product.image_url, member_discount: product.member_discount }, qty)}
-                  disabled={!product.in_stock}
-                  className="flex-1 bg-primary text-primary-foreground py-3 rounded-[2px] text-sm font-semibold tracking-[0.1em] uppercase hover:bg-primary/90 transition-all disabled:opacity-50"
-                >
-                  {product.in_stock ? 'Add to Basket' : 'Out of Stock'}
-                </button>
-              </div>
-
-              {!product.in_stock && <p className="text-destructive text-sm font-medium">Currently out of stock</p>}
-            </div>
+          <div className="flex items-center gap-1 mb-4">
+            {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-secondary text-secondary" />)}
+            <span className="text-xs text-muted-foreground ml-1">4.8 (127 reviews)</span>
           </div>
 
-          {/* Related */}
+          {/* Price */}
+          <div className="mb-4">
+            {memberPrice ? (
+              <div className="flex items-baseline gap-3">
+                <span className="font-header text-3xl text-primary">£{memberPrice.toFixed(2)}</span>
+                <span className="text-lg text-muted-foreground line-through">£{product.price.toFixed(2)}</span>
+                <span className="bg-primary/10 text-primary text-xs font-semibold px-2.5 py-1 rounded">Member Price</span>
+              </div>
+            ) : (
+              <span className="font-header text-3xl text-foreground">£{product.price.toFixed(2)}</span>
+            )}
+          </div>
+
+          {/* Points */}
+          <div className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-2 rounded-xl mb-6">
+            <Star className="w-4 h-4" />
+            <span className="text-sm font-semibold">Earn {pts} U Points with this purchase</span>
+          </div>
+
+          {/* Qty + Add to Cart */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center border border-border rounded-xl overflow-hidden">
+              <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-3 text-lg hover:bg-muted transition-colors">−</button>
+              <span className="px-4 py-3 text-sm font-semibold min-w-[40px] text-center">{qty}</span>
+              <button onClick={() => setQty(qty + 1)} className="px-4 py-3 text-lg hover:bg-muted transition-colors">+</button>
+            </div>
+            <button
+              onClick={() => {
+                addItem({ product_id: product.id, name: product.name, price: memberPrice || product.price, image_url: product.image_url, member_discount: product.member_discount }, qty);
+                toast.success(`${product.name} added to basket`);
+              }}
+              disabled={!product.in_stock}
+              className="flex-1 bg-secondary text-secondary-foreground py-3.5 rounded-xl text-sm font-bold tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              {product.in_stock ? 'Add to Basket' : 'Out of Stock'}
+            </button>
+          </div>
+
+          {/* Related products */}
           {related.length > 0 && (
-            <div className="mt-20">
-              <h2 className="section-title text-2xl mb-8">You May Also Like</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <>
+              <h2 className="font-header text-sm tracking-[0.1em] uppercase mb-4">You May Also Like</h2>
+              <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
                 {related.map(p => (
-                  <Link to={`/product/${p.id}`} key={p.id} className="bg-card rounded-lg overflow-hidden hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] transition-all group">
-                    <div className="h-40 overflow-hidden">
-                      <img src={p.image_url || '/placeholder.svg'} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Link to={`/product/${p.id}`} key={p.id} className="bg-card rounded-xl overflow-hidden flex-shrink-0 w-[140px]">
+                    <div className="h-[100px] overflow-hidden">
+                      <img src={p.image_url || '/placeholder.svg'} alt={p.name} className="w-full h-full object-cover" />
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-header text-xs tracking-[0.05em] uppercase mb-1">{p.name}</h3>
-                      <span className="font-header text-base text-foreground">£{p.price.toFixed(2)}</span>
+                    <div className="p-2.5">
+                      <h3 className="text-xs font-semibold text-foreground truncate mb-1">{p.name}</h3>
+                      <span className="font-header text-sm text-foreground">£{p.price.toFixed(2)}</span>
                     </div>
                   </Link>
                 ))}
               </div>
-            </div>
+            </>
           )}
         </div>
       </main>
-      <Footer />
+      <BottomTabBar />
     </>
   );
 };
