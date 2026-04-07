@@ -12,7 +12,7 @@ import { MapPin, Clock, ChevronRight, Star, ShoppingCart } from 'lucide-react';
 
 const categoryImages: Record<string, string> = {
   'Fresh Halal Meat': 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&q=80',
-  'Frozen Foods': 'https://images.unsplash.com/photo-1585985740516-e0b80c3c1da8?w=600&q=80',
+  'Frozen Foods': 'https://dmrqkbkq8el9i.cloudfront.net/Pictures/480xany/1/1/6/347116_muhammedamustaphal8pjwy8n2jaunsplash_705330_crop.jpg',
   'Sauces': 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600&q=80',
   'Masalas & Spices': 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&q=80',
   'Drinks': 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=600&q=80',
@@ -27,7 +27,7 @@ const categories = [
 const dealsList = [
   { id: 1, title: 'Lamb Leg Whole', badge: 'Double Deal', price: '£8.99/kg', original: '£11.99/kg', img: 'https://images.unsplash.com/photo-1588347818036-558601350947?w=600&q=80' },
   { id: 2, title: 'Shan Biryani Masala 10-pack', badge: 'Mega Pack', price: '£9.99', original: '£14.99', img: 'https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?w=600&q=80' },
-  { id: 3, title: 'Basmati Rice 10kg', badge: 'Save 20%', price: '£12.00', original: '£15.00', img: 'https://images.unsplash.com/photo-1587049352847-4d4b126a5424?w=600&q=80' },
+  { id: 3, title: 'Basmati Rice 10kg', badge: 'Save 20%', price: '£12.00', original: '£15.00', img: 'https://fatimacooks.net/wp-content/uploads/2024/07/Basmati-Rice-7.jpg' },
   { id: 4, title: 'Chicken Breast 5kg', badge: 'Double Deal', price: '£24.99', original: '£32.99', img: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&q=80' },
 ];
 
