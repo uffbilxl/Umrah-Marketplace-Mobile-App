@@ -17,7 +17,7 @@ const RewardsPage = () => {
   const navigate = useNavigate();
   const [purchases, setPurchases] = useState<any[]>([]);
   const [vouchers, setVouchers] = useState<any[]>([]);
-  const [qrModal, setQrModal] = useState<{ code: string; value: number } | null>(null);
+  const [qrModal, setQrModal] = useState<{ type: 'loyalty' | 'voucher'; code: string; value?: number } | null>(null);
 
   // Auth state
   const [tab, setTab] = useState<'register' | 'login'>('register');
@@ -74,7 +74,7 @@ const RewardsPage = () => {
     await refreshProfile();
     await fetchData();
     toast.success(`Voucher ${code} created!`);
-    setQrModal({ code, value });
+    setQrModal({ type: 'voucher', code, value });
   };
 
   // Not logged in - show auth
@@ -194,11 +194,7 @@ const RewardsPage = () => {
           <div className="grid grid-cols-3 gap-3 mb-8">
             {[
               { icon: QrCode, label: 'SCAN\nCARD', action: () => {
-                if (vouchers.length > 0) {
-                  setQrModal({ code: vouchers[0].code, value: Number(vouchers[0].value) });
-                } else {
-                  toast.info('No vouchers to scan. Redeem your points first!');
-                }
+                setQrModal({ type: 'loyalty', code: `UMRAH-MEMBER-${user.id.slice(0, 8).toUpperCase()}` });
               }},
               { icon: Tag, label: 'OFFERS', action: () => navigate('/search') },
               { icon: Clock, label: 'HISTORY', action: () => navigate('/profile?tab=orders') },
@@ -295,11 +291,26 @@ const RewardsPage = () => {
             >
               <X className="w-4 h-4" />
             </button>
-            <h3 className="font-header text-lg tracking-[0.1em] uppercase mb-2">
-              Your Voucher
-            </h3>
-            <p className="text-2xl font-bold text-secondary mb-1">£{qrModal.value.toFixed(2)} OFF</p>
-            <p className="text-xs text-muted-foreground mb-6">Show this QR code at the till to redeem</p>
+
+            {qrModal.type === 'loyalty' ? (
+              <>
+                <h3 className="font-header text-lg tracking-[0.1em] uppercase mb-1">
+                  Loyalty Card
+                </h3>
+                <p className="text-xs text-muted-foreground mb-1">Member: {profile?.name}</p>
+                <p className="text-sm font-bold text-secondary mb-4">{profile?.points.toLocaleString()} U Points</p>
+                <p className="text-xs text-muted-foreground mb-4">Show this QR code at the till to earn points on your purchase</p>
+              </>
+            ) : (
+              <>
+                <h3 className="font-header text-lg tracking-[0.1em] uppercase mb-2">
+                  Your Voucher
+                </h3>
+                <p className="text-2xl font-bold text-secondary mb-1">£{qrModal.value?.toFixed(2)} OFF</p>
+                <p className="text-xs text-muted-foreground mb-4">Show this QR code at the till to redeem</p>
+              </>
+            )}
+
             <div className="bg-foreground rounded-xl p-4 inline-block mb-4">
               <QRCodeSVG
                 value={qrModal.code}
