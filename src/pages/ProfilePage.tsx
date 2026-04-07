@@ -103,6 +103,7 @@ const ProfilePage = () => {
     if (error) { toast.error('Failed to generate voucher'); return; }
     await supabase.from('profiles').update({ points: pointsRemaining }).eq('id', user.id);
     await refreshProfile();
+    await fetchProfileData();
     toast.success(`Voucher generated: ${code} — use this at checkout for £${voucherValue.toFixed(2)} off!`);
   };
 
