@@ -30,6 +30,7 @@ const ProfilePage = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+  const [vouchers, setVouchers] = useState<any[]>([]);
 
   useEffect(() => { document.title = 'My Profile | Umrah Supermarket'; }, []);
 
@@ -45,20 +46,22 @@ const ProfilePage = () => {
     }
   }, [profile]);
 
+  const fetchProfileData = async () => {
+    if (!user) return;
+    setOrdersLoading(true);
+    const [orderRes, voucherRes] = await Promise.all([
+      supabase.from('purchases').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+      supabase.from('vouchers').select('*').eq('user_id', user.id).eq('used', false).order('created_at', { ascending: false }),
+    ]);
+    const data = orderRes.data || [];
+    setOrders(data);
+    setOrdersLoading(false);
+    if (data.length > 0) setExpandedOrder(data[0].id);
+    setVouchers(voucherRes.data || []);
+  };
+
   useEffect(() => {
-    if (user) {
-      setOrdersLoading(true);
-      supabase
-        .from('purchases')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .then(({ data }) => {
-          setOrders(data || []);
-          setOrdersLoading(false);
-          if (data && data.length > 0) setExpandedOrder(data[0].id);
-        });
-    }
+    fetchProfileData();
   }, [user]);
 
   const handleSaveDetails = async () => {
@@ -100,6 +103,7 @@ const ProfilePage = () => {
     if (error) { toast.error('Failed to generate voucher'); return; }
     await supabase.from('profiles').update({ points: pointsRemaining }).eq('id', user.id);
     await refreshProfile();
+    await fetchProfileData();
     toast.success(`Voucher generated: ${code} — use this at checkout for £${voucherValue.toFixed(2)} off!`);
   };
 
@@ -321,6 +325,33 @@ const ProfilePage = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Saved Vouchers */}
+                {vouchers.length > 0 && (
+                  <div>
+                    <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Your Saved Vouchers</h3>
+                    <div className="space-y-3">
+                      {vouchers.map(v => (
+                        <div key={v.id} className="flex items-center justify-between bg-secondary/5 border border-secondary/20 rounded-lg p-4">
+                          <div>
+                            <span className="font-mono font-bold text-sm tracking-wider">{v.code}</span>
+                            <div className="text-xs text-muted-foreground mt-0.5">Created {new Date(v.created_at).toLocaleDateString('en-GB')}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-header text-lg text-secondary">£{Number(v.value).toFixed(2)}</div>
+                            <button
+                              onClick={() => { navigator.clipboard.writeText(v.code); toast.success('Voucher code copied!'); }}
+                              className="text-xs text-primary hover:text-primary/80 font-semibold mt-0.5"
+                            >
+                              <i className="fas fa-copy mr-1" />Copy
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-3">Enter these codes at checkout to apply the discount.</p>
+                  </div>
+                )}
 
                 {/* Points history */}
                 <div className="bg-card rounded-lg p-6">
