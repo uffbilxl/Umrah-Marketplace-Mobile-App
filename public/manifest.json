@@ -1,0 +1,22 @@
+{
+  "name": "Umrah Supermarket",
+  "short_name": "Umrah",
+  "description": "Your one-stop multicultural supermarket. Shop, earn U Points, and save.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#1a4d2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
