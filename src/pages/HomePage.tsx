@@ -54,13 +54,22 @@ const HomePage = () => {
           <p className="text-lg text-umrah-white/70 mb-10 leading-7 max-w-[550px]">
             Premium Halal meats, fresh seasonal produce, and authentic ingredients sourced from African, Caribbean, and Asian markets — all under one roof.
           </p>
-          <div className="flex gap-4 flex-wrap">
+          <div className="flex gap-4 flex-wrap justify-center">
             <Link to="/shop" className="inline-flex items-center gap-2.5 bg-secondary text-umrah-black px-9 py-4 font-body text-[0.8rem] font-bold tracking-[0.15em] uppercase border-2 border-secondary rounded-[2px] hover:bg-transparent hover:text-secondary transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-gold)]">
               Explore Our Range <i className="fas fa-arrow-right" />
             </Link>
             <Link to="/upoints" className="inline-flex items-center gap-2.5 bg-transparent text-umrah-white px-9 py-4 font-body text-[0.8rem] font-bold tracking-[0.15em] uppercase border-2 border-umrah-white/30 rounded-[2px] hover:border-umrah-white hover:bg-umrah-white hover:text-umrah-black transition-all hover:-translate-y-0.5">
               <i className="fas fa-mobile-alt" /> Download Our App
             </Link>
+          </div>
+          {/* Stats inline below buttons */}
+          <div className="hidden md:flex gap-14 mt-10">
+            {[{ n: '7+', l: 'Stores UK Wide' }, { n: '5K+', l: 'Products' }, { n: '100%', l: 'Halal Certified' }].map(s => (
+              <div key={s.l} className="text-center">
+                <div className="font-header text-[2rem] text-secondary leading-none mb-1">{s.n}</div>
+                <div className="text-[0.65rem] text-umrah-white/50 tracking-[0.2em] uppercase">{s.l}</div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -90,15 +99,6 @@ const HomePage = () => {
           ))}
         </div>
 
-        {/* Stats - centered at bottom */}
-        <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 gap-16 z-10">
-          {[{ n: '7+', l: 'Stores UK Wide' }, { n: '5K+', l: 'Products' }, { n: '100%', l: 'Halal Certified' }].map(s => (
-            <div key={s.l} className="text-center">
-              <div className="font-header text-[2rem] text-secondary leading-none mb-1">{s.n}</div>
-              <div className="text-[0.65rem] text-umrah-white/50 tracking-[0.2em] uppercase">{s.l}</div>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* Marquee */}
