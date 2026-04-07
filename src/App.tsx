@@ -12,6 +12,7 @@ import StoresPage from "./pages/StoresPage";
 import AboutPage from "./pages/AboutPage";
 import DealsPage from "./pages/DealsPage";
 import CartPage from "./pages/CartPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import Preloader from "./components/Preloader";
 

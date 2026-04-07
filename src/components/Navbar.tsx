@@ -1,15 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBasket } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingBasket, User, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import AuthModal from '@/components/AuthModal';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, profile } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
   const { totalItems } = useCart();
   const location = useLocation();
+  const navigate = useNavigate();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -17,7 +22,15 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => setMobileOpen(false), [location]);
+  useEffect(() => { setMobileOpen(false); setUserMenuOpen(false); }, [location]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const isHome = location.pathname === '/';
   const navBg = scrolled || !isHome
@@ -25,6 +38,15 @@ const Navbar = () => {
     : 'py-5';
 
   const navLinkClass = "text-[0.8rem] font-medium text-umrah-white tracking-[0.15em] uppercase relative py-1 hover:text-secondary transition-all duration-400 after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[1.5px] after:bg-secondary after:transition-all after:duration-400 hover:after:w-full";
+
+  const initials = profile?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '';
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+    const { toast } = await import('sonner');
+    toast.info("You've been signed out");
+  };
 
   return (
     <>
@@ -54,14 +76,44 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-            {user ? (
-              <Link to="/upoints" className="bg-secondary text-umrah-black px-6 py-2.5 rounded-[2px] text-[0.8rem] font-semibold tracking-[0.15em] uppercase hover:bg-umrah-white transition-all">
-                My Account
-              </Link>
+
+            {user && profile ? (
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 bg-secondary text-umrah-black px-4 py-2 rounded-[2px] text-[0.8rem] font-semibold tracking-[0.1em] uppercase hover:bg-umrah-white transition-all"
+                >
+                  <span className="w-6 h-6 bg-umrah-black/10 rounded-full flex items-center justify-center text-[0.6rem] font-bold">
+                    {initials}
+                  </span>
+                  {profile.name.split(' ')[0]}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-[var(--shadow-lg)] border border-border overflow-hidden z-50">
+                    <Link to="/profile" className="flex items-center gap-2 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
+                      <User className="w-4 h-4" /> My Profile
+                    </Link>
+                    <Link to="/profile?tab=orders" className="flex items-center gap-2 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
+                      📦 My Orders
+                    </Link>
+                    <Link to="/upoints" className="flex items-center gap-2 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
+                      ⭐ U Points
+                    </Link>
+                    <div className="border-t border-border" />
+                    <button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-3 text-sm text-destructive hover:bg-muted transition-colors w-full">
+                      <LogOut className="w-4 h-4" /> Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <Link to="/upoints" className="bg-secondary text-umrah-black px-6 py-2.5 rounded-[2px] text-[0.8rem] font-semibold tracking-[0.15em] uppercase hover:bg-umrah-white transition-all">
+              <button
+                onClick={() => setAuthOpen(true)}
+                className="bg-secondary text-umrah-black px-6 py-2.5 rounded-[2px] text-[0.8rem] font-semibold tracking-[0.15em] uppercase hover:bg-umrah-white transition-all"
+              >
                 Sign In
-              </Link>
+              </button>
             )}
           </div>
           <button
@@ -85,10 +137,24 @@ const Navbar = () => {
         <Link to="/cart" className="font-header text-3xl text-umrah-white tracking-[0.1em] uppercase hover:text-secondary">
           Basket {totalItems > 0 && `(${totalItems})`}
         </Link>
-        <Link to="/upoints" className="bg-secondary text-umrah-black px-8 py-3 rounded-[2px] font-semibold tracking-[0.15em] uppercase mt-4">
-          {user ? 'My Account' : 'Sign In'}
-        </Link>
+        {user ? (
+          <>
+            <Link to="/profile" className="font-header text-3xl text-umrah-white tracking-[0.1em] uppercase hover:text-secondary">Profile</Link>
+            <button onClick={handleSignOut} className="bg-secondary text-umrah-black px-8 py-3 rounded-[2px] font-semibold tracking-[0.15em] uppercase mt-4">
+              Sign Out
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => { setMobileOpen(false); setAuthOpen(true); }}
+            className="bg-secondary text-umrah-black px-8 py-3 rounded-[2px] font-semibold tracking-[0.15em] uppercase mt-4"
+          >
+            Sign In
+          </button>
+        )}
       </div>
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
 };
