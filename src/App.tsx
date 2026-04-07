@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Preloader from "@/components/Preloader";
 import DecorativeStrip from "@/components/DecorativeStrip";
+import SidePatternStrip from "@/components/SidePatternStrip";
 import HomePage from "./pages/HomePage";
 import SearchPage from "./pages/SearchPage";
 import RewardsPage from "./pages/RewardsPage";
@@ -27,6 +28,8 @@ const App = () => (
       <Preloader />
       <DecorativeStrip position="top" />
       <DecorativeStrip position="bottom" />
+      <SidePatternStrip side="left" />
+      <SidePatternStrip side="right" />
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
