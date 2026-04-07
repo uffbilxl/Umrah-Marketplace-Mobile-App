@@ -88,9 +88,16 @@ const ProfilePage = () => {
 
   const handleRedeem = async () => {
     if (!profile || !user) return;
-    const { voucherValue, pointsRemaining } = redeemCalc(profile.points);
+    const { voucherValue, pointsRemaining, pointsRedeemed } = redeemCalc(profile.points);
     if (voucherValue <= 0) return;
     const code = 'UMRAH-' + Array.from({ length: 8 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
+    const { error } = await supabase.from('vouchers').insert({
+      user_id: user.id,
+      code,
+      value: voucherValue,
+      points_spent: pointsRedeemed,
+    });
+    if (error) { toast.error('Failed to generate voucher'); return; }
     await supabase.from('profiles').update({ points: pointsRemaining }).eq('id', user.id);
     await refreshProfile();
     toast.success(`Voucher generated: ${code} — use this at checkout for £${voucherValue.toFixed(2)} off!`);

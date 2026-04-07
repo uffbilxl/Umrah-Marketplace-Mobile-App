@@ -143,12 +143,19 @@ const UPointsPage = () => {
                   <div className="text-sm text-muted-foreground mb-4">Available to redeem now</div>
                   <button
                     onClick={async () => {
-                      const { voucherValue: val, pointsRemaining } = redeemCalc(profile.points);
+                      const { voucherValue: val, pointsRemaining, pointsRedeemed } = redeemCalc(profile.points);
                       if (val <= 0) return;
                       const code = 'UMRAH-' + Array.from({ length: 8 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
+                      const { error } = await supabase.from('vouchers').insert({
+                        user_id: user.id,
+                        code,
+                        value: val,
+                        points_spent: pointsRedeemed,
+                      });
+                      if (error) { toast.error('Failed to generate voucher'); return; }
                       await supabase.from('profiles').update({ points: pointsRemaining }).eq('id', user.id);
                       await refreshProfile();
-                      toast.success(`Voucher generated: ${code} — use this at checkout for £${val.toFixed(2)} off!`);
+                      toast.success(`Voucher ${code} created! Worth £${val.toFixed(2)} — apply it at checkout.`);
                     }}
                     className="bg-secondary text-secondary-foreground px-8 py-3 rounded-[2px] text-sm font-bold tracking-[0.1em] uppercase hover:bg-umrah-gold-dark transition-all"
                   >

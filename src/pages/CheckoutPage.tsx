@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Preloader from '@/components/Preloader';
 import { calcPoints } from '@/lib/points';
+import { toast } from 'sonner';
 
 const paymentMethods = [
   { id: 'card', icon: 'fa-credit-card', label: 'Credit / Debit Card', desc: 'Visa, Mastercard, Amex' },
@@ -15,6 +17,12 @@ const paymentMethods = [
   { id: 'klarna', icon: 'fa-clock', label: 'Klarna — Pay Later', desc: 'Buy now, pay in 3 instalments' },
 ];
 
+interface AppliedVoucher {
+  id: number;
+  code: string;
+  value: number;
+}
+
 const CheckoutPage = () => {
   const { items, subtotal, clearCart } = useCart();
   const { user } = useAuth();
@@ -23,14 +31,63 @@ const CheckoutPage = () => {
   const [processing, setProcessing] = useState(false);
   const [complete, setComplete] = useState(false);
 
+  // Voucher state
+  const [voucherInput, setVoucherInput] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState<AppliedVoucher | null>(null);
+  const [voucherError, setVoucherError] = useState('');
+  const [checkingVoucher, setCheckingVoucher] = useState(false);
+
   useEffect(() => { document.title = 'Checkout | Umrah Supermarket'; }, []);
 
   const memberDiscount = user ? items.reduce((s, i) => s + (i.member_discount > 0 ? i.price * i.quantity * (i.member_discount / 100) : 0), 0) : 0;
-  const total = subtotal - memberDiscount;
+  const afterMemberDiscount = subtotal - memberDiscount;
+  const voucherDiscount = appliedVoucher ? Math.min(appliedVoucher.value, afterMemberDiscount) : 0;
+  const total = Math.max(afterMemberDiscount - voucherDiscount, 0);
   const pointsToEarn = calcPoints(total);
 
-  const handlePay = () => {
+  const handleApplyVoucher = async () => {
+    const code = voucherInput.trim().toUpperCase();
+    if (!code) return;
+    setVoucherError('');
+    setCheckingVoucher(true);
+
+    const { data, error } = await supabase
+      .from('vouchers')
+      .select('*')
+      .eq('code', code)
+      .eq('used', false)
+      .maybeSingle();
+
+    setCheckingVoucher(false);
+
+    if (error || !data) {
+      setVoucherError('Invalid or already used voucher code.');
+      return;
+    }
+
+    if (user && data.user_id !== user.id) {
+      setVoucherError('This voucher belongs to a different account.');
+      return;
+    }
+
+    setAppliedVoucher({ id: data.id, code: data.code, value: Number(data.value) });
+    toast.success(`Voucher applied: £${Number(data.value).toFixed(2)} off!`);
+  };
+
+  const handleRemoveVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherInput('');
+    setVoucherError('');
+  };
+
+  const handlePay = async () => {
     setProcessing(true);
+
+    // Mark voucher as used if applied
+    if (appliedVoucher) {
+      await supabase.from('vouchers').update({ used: true }).eq('id', appliedVoucher.id);
+    }
+
     setTimeout(() => {
       setProcessing(false);
       setComplete(true);
@@ -53,6 +110,9 @@ const CheckoutPage = () => {
             <div className="bg-card rounded-lg p-6 mb-8 text-left">
               <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Order Number</span><span className="font-semibold">UM-{Date.now().toString().slice(-6)}</span></div>
               <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Payment Method</span><span className="font-semibold capitalize">{paymentMethods.find(m => m.id === selected)?.label}</span></div>
+              {appliedVoucher && (
+                <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Voucher Used</span><span className="font-semibold">{appliedVoucher.code}</span></div>
+              )}
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total Paid</span><span className="font-header text-lg">£{total.toFixed(2)}</span></div>
             </div>
             <div className="flex gap-3 justify-center flex-wrap">
@@ -150,10 +210,48 @@ const CheckoutPage = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Voucher input */}
+                <div className="border-t border-border pt-4 mb-4">
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Voucher Code</label>
+                  {appliedVoucher ? (
+                    <div className="flex items-center justify-between bg-secondary/10 border border-secondary/30 rounded p-3">
+                      <div>
+                        <span className="text-sm font-semibold text-secondary">{appliedVoucher.code}</span>
+                        <span className="text-xs text-muted-foreground ml-2">-£{appliedVoucher.value.toFixed(2)}</span>
+                      </div>
+                      <button onClick={handleRemoveVoucher} className="text-xs text-destructive hover:text-destructive/80 font-semibold">
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="e.g. UMRAH-ABCD1234"
+                        value={voucherInput}
+                        onChange={e => { setVoucherInput(e.target.value); setVoucherError(''); }}
+                        className="flex-1 px-3 py-2 bg-muted border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
+                      />
+                      <button
+                        onClick={handleApplyVoucher}
+                        disabled={checkingVoucher || !voucherInput.trim()}
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded text-xs font-bold tracking-wider uppercase hover:bg-primary/90 transition-all disabled:opacity-50"
+                      >
+                        {checkingVoucher ? '...' : 'Apply'}
+                      </button>
+                    </div>
+                  )}
+                  {voucherError && <p className="text-xs text-destructive mt-1">{voucherError}</p>}
+                </div>
+
                 <div className="border-t border-border pt-4 space-y-2 text-sm">
                   <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>£{subtotal.toFixed(2)}</span></div>
                   {memberDiscount > 0 && (
                     <div className="flex justify-between text-primary"><span>Member Discount</span><span>-£{memberDiscount.toFixed(2)}</span></div>
+                  )}
+                  {voucherDiscount > 0 && (
+                    <div className="flex justify-between text-secondary"><span>Voucher</span><span>-£{voucherDiscount.toFixed(2)}</span></div>
                   )}
                   <div className="flex justify-between text-secondary font-semibold"><span>U Points to earn</span><span>+{pointsToEarn} pts</span></div>
                   <div className="border-t border-border pt-3 flex justify-between font-header text-lg">

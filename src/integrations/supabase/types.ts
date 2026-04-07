@@ -160,6 +160,36 @@ export type Database = {
           },
         ]
       }
+      vouchers: {
+        Row: {
+          code: string
+          created_at: string
+          id: number
+          points_spent: number
+          used: boolean
+          user_id: string
+          value: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: never
+          points_spent?: number
+          used?: boolean
+          user_id: string
+          value: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: never
+          points_spent?: number
+          used?: boolean
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
