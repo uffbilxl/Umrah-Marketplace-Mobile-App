@@ -38,16 +38,38 @@ const HomePage = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative h-screen min-h-[750px] flex items-center bg-umrah-black overflow-hidden">
+      <section className="relative h-screen min-h-[750px] flex flex-col bg-umrah-black overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center brightness-[0.3]" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542838132-92c53300491e?w=1920&q=80')" }} />
         <div className="absolute inset-0 bg-gradient-to-br from-umrah-black/[0.88] via-umrah-black/50 to-umrah-black/75" />
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, hsl(var(--umrah-gold)) 1px, transparent 1px), radial-gradient(circle at 75% 75%, hsl(var(--umrah-gold)) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
 
-        <div className="container-umrah relative z-10 max-w-[650px] xl:mx-auto xl:text-center xl:flex xl:flex-col xl:items-center">
-          <div className="inline-flex items-center gap-2.5 bg-secondary/10 border border-secondary/30 px-5 py-2 rounded-[2px] mb-8">
-            <i className="fas fa-star text-secondary text-[0.6rem]" />
-            <span className="text-[0.7rem] font-semibold text-secondary tracking-[0.25em] uppercase">Your One-Stop Multicultural Supermarket</span>
+        {/* Scrolling tagline strip below navbar */}
+        <div className="relative z-10 mt-[80px] bg-secondary/10 border-y border-secondary/20 py-2 overflow-hidden">
+          <div className="flex animate-[marqueeScroll_30s_linear_infinite] whitespace-nowrap">
+            {[
+              'Your One-Stop Multicultural Supermarket',
+              '100% Halal Certified Products',
+              'Premium Quality at Best Prices',
+              'Fresh Daily From Farm to Shelf',
+              '7+ Stores Across the UK',
+              'Earn U Points on Every Shop',
+              'Your One-Stop Multicultural Supermarket',
+              '100% Halal Certified Products',
+              'Premium Quality at Best Prices',
+              'Fresh Daily From Farm to Shelf',
+              '7+ Stores Across the UK',
+              'Earn U Points on Every Shop',
+            ].map((text, i) => (
+              <span key={i} className="inline-flex items-center gap-3 mr-10 text-[0.65rem] font-semibold text-secondary tracking-[0.2em] uppercase shrink-0">
+                <i className="fas fa-star text-[0.4rem]" />{text}
+              </span>
+            ))}
           </div>
+        </div>
+
+        {/* Hero content */}
+        <div className="flex-1 flex items-center justify-center relative z-10">
+        <div className="max-w-[650px] xl:mx-auto xl:text-center xl:flex xl:flex-col xl:items-center px-6">
           <h1 className="text-[clamp(2.8rem,6vw,5rem)] text-umrah-white uppercase tracking-[0.08em] mb-2.5 leading-[1.05] font-header">
             Quality.<br />Freshness.<br /><span className="text-secondary">Best Prices.</span>
           </h1>
@@ -71,6 +93,7 @@ const HomePage = () => {
               </div>
             ))}
           </div>
+        </div>
         </div>
 
         {/* Hero tiles left - desktop only */}
