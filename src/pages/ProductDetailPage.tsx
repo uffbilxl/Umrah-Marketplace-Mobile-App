@@ -59,7 +59,7 @@ const ProductDetailPage = () => {
   }
 
   const memberPrice = user && product.member_discount > 0 ? product.price * (1 - product.member_discount / 100) : null;
-  const pts = Math.floor(product.price * 10);
+  const pts = Math.floor(product.price);
 
   return (
     <>
