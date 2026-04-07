@@ -12,7 +12,7 @@ const Navbar = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
-  const { totalItems } = useCart();
+  const { totalItems, items: cartItems, subtotal: cartSubtotal } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
