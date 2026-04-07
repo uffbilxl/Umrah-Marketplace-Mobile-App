@@ -5,6 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Preloader from '@/components/Preloader';
+import { calcVoucherValue, nextVoucherPointsNeeded, redeemCalc } from '@/lib/points';
+import { toast } from 'sonner';
 
 const STORES = ['Leicester', 'Liverpool', 'Huddersfield', 'Northampton'];
 
@@ -52,17 +54,14 @@ const UPointsPage = () => {
     setSubmitting(false);
   };
 
-  const tierProgress = () => {
-    if (!profile) return { next: 'Silver', needed: 1000, pct: 0 };
-    if (profile.points < 1000) return { next: 'Silver', needed: 1000 - profile.points, pct: (profile.points / 1000) * 100 };
-    if (profile.points < 5000) return { next: 'Gold', needed: 5000 - profile.points, pct: ((profile.points - 1000) / 4000) * 100 };
-    return { next: 'Gold', needed: 0, pct: 100 };
-  };
-
-  const tp = tierProgress();
-
   // Logged in dashboard
   if (user && profile) {
+    const voucherValue = calcVoucherValue(profile.points);
+    const ptsToNext = nextVoucherPointsNeeded(profile.points);
+    const progressPct = profile.points >= 200
+      ? 100
+      : (profile.points / 200) * 100;
+
     return (
       <>
         <Preloader /><Navbar />
@@ -77,13 +76,19 @@ const UPointsPage = () => {
               <div className="text-sm text-umrah-black/60 tracking-[0.15em] uppercase font-semibold mb-1">Total Balance</div>
               <div className="font-header text-5xl text-umrah-black leading-none mb-4">{profile.points.toLocaleString()} pts</div>
               <div className="w-full h-2 bg-umrah-black/15 rounded-full overflow-hidden mb-2">
-                <div className="h-full bg-umrah-black rounded-full transition-all" style={{ width: `${Math.min(tp.pct, 100)}%` }} />
+                <div className="h-full bg-umrah-black rounded-full transition-all" style={{ width: `${Math.min(progressPct, 100)}%` }} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-umrah-black/50 font-semibold">{tp.needed > 0 ? `${tp.needed} pts until ${tp.next}` : 'Maximum tier reached!'}</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${profile.tier === 'Gold' ? 'bg-umrah-black text-secondary' : profile.tier === 'Silver' ? 'bg-umrah-black/20 text-umrah-black' : 'bg-umrah-black/10 text-umrah-black/70'}`}>
-                  {profile.tier}
+                <span className="text-sm text-umrah-black/50 font-semibold">
+                  {voucherValue > 0
+                    ? `Voucher available: £${voucherValue.toFixed(2)}`
+                    : `${ptsToNext} pts until first voucher`}
                 </span>
+                {ptsToNext > 0 && voucherValue > 0 && (
+                  <span className="text-xs text-umrah-black/40">
+                    +{ptsToNext} pts to next level
+                  </span>
+                )}
               </div>
             </div>
 
@@ -129,18 +134,33 @@ const UPointsPage = () => {
               )}
             </div>
 
-            {/* Rewards */}
+            {/* Voucher Redemption */}
             <div className="bg-card rounded-lg p-6 mb-8">
-              <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Available Rewards</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[{ pts: 500, val: '£5' }, { pts: 1000, val: '£10' }, { pts: 2000, val: '£20' }].map(r => (
-                  <div key={r.pts} className="border border-border rounded-lg p-4 text-center">
-                    <div className="font-header text-xl text-secondary mb-1">{r.val}</div>
-                    <div className="text-xs text-muted-foreground uppercase tracking-wider">Voucher</div>
-                    <div className="text-sm font-semibold mt-2">{r.pts} pts</div>
-                  </div>
-                ))}
-              </div>
+              <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Your Voucher</h3>
+              {voucherValue > 0 ? (
+                <div className="text-center">
+                  <div className="font-header text-3xl text-secondary mb-2">£{voucherValue.toFixed(2)}</div>
+                  <div className="text-sm text-muted-foreground mb-4">Available to redeem now</div>
+                  <button
+                    onClick={async () => {
+                      const { voucherValue: val, pointsRemaining } = redeemCalc(profile.points);
+                      if (val <= 0) return;
+                      const code = 'UMRAH-' + Array.from({ length: 8 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
+                      await supabase.from('profiles').update({ points: pointsRemaining }).eq('id', user.id);
+                      await refreshProfile();
+                      toast.success(`Voucher generated: ${code} — use this at checkout for £${val.toFixed(2)} off!`);
+                    }}
+                    className="bg-secondary text-secondary-foreground px-8 py-3 rounded-[2px] text-sm font-bold tracking-[0.1em] uppercase hover:bg-umrah-gold-dark transition-all"
+                  >
+                    Redeem £{voucherValue.toFixed(2)} Voucher
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">You need at least 200 points to redeem a voucher.</div>
+                  <div className="text-sm text-secondary font-semibold mt-2">{ptsToNext} more points to go!</div>
+                </div>
+              )}
             </div>
 
             <button onClick={() => signOut().then(() => navigate('/'))} className="bg-destructive text-destructive-foreground px-8 py-3 rounded-[2px] text-sm font-semibold tracking-[0.1em] uppercase hover:bg-destructive/90 transition-all">
@@ -164,7 +184,7 @@ const UPointsPage = () => {
             <span className="section-label">U Points Loyalty</span>
             <h1 className="section-title text-umrah-white">Shop. Earn. Save.</h1>
             <div className="gold-line mx-auto" />
-            <p className="section-subtitle text-umrah-white/50 mx-auto">Join U Points and earn rewards every time you shop. Collect points, unlock exclusive member discounts, and rise through the tiers.</p>
+            <p className="section-subtitle text-umrah-white/50 mx-auto">Join U Points and earn rewards every time you shop. Collect points and redeem them for vouchers to save on your next purchase.</p>
           </div>
         </section>
 
@@ -173,9 +193,9 @@ const UPointsPage = () => {
           <div className="container-umrah">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               {[
-                { step: '01', title: 'Earn', desc: '10 points for every £1 spent in store or online', icon: 'fa-coins' },
-                { step: '02', title: 'Rise', desc: 'Reach Silver (1,000pts) or Gold (5,000pts) tier', icon: 'fa-crown' },
-                { step: '03', title: 'Save', desc: 'Redeem points for vouchers and exclusive member discounts', icon: 'fa-piggy-bank' },
+                { step: '01', title: 'Earn', desc: '1 point for every £1 spent in store or online', icon: 'fa-coins' },
+                { step: '02', title: 'Collect', desc: 'Reach 200 points to unlock your first voucher', icon: 'fa-piggy-bank' },
+                { step: '03', title: 'Save', desc: 'Redeem points for vouchers — the more you collect, the more you save', icon: 'fa-tag' },
               ].map(s => (
                 <div key={s.step} className="text-center p-8">
                   <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -188,25 +208,30 @@ const UPointsPage = () => {
               ))}
             </div>
 
-            {/* Tier table */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-              {[
-                { name: 'Bronze', range: '0–999 pts', perks: ['Basic member pricing'] },
-                { name: 'Silver', range: '1,000–4,999 pts', perks: ['5% extra off all deals', 'Priority deal alerts'] },
-                { name: 'Gold', range: '5,000+ pts', perks: ['10% extra off', 'Exclusive Gold-only products', 'Free delivery (future)'] },
-              ].map(t => (
-                <div key={t.name} className={`rounded-lg p-6 border ${t.name === 'Gold' ? 'border-secondary bg-secondary/5' : 'border-border bg-card'}`}>
-                  <h3 className="font-header text-lg tracking-[0.1em] uppercase mb-1">{t.name}</h3>
-                  <p className="text-sm text-secondary font-semibold mb-4">{t.range}</p>
-                  <ul className="space-y-2">
-                    {t.perks.map(p => (
-                      <li key={p} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <i className="fas fa-check text-secondary text-xs mt-1" />{p}
-                      </li>
+            {/* Voucher value table */}
+            <div className="max-w-[600px] mx-auto mb-16">
+              <h2 className="font-header text-lg tracking-[0.08em] uppercase text-center mb-6">Voucher Values</h2>
+              <div className="bg-card rounded-lg border border-border overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-muted-foreground tracking-[0.1em] uppercase border-b border-border bg-muted">
+                      <th className="p-4">Points</th>
+                      <th className="p-4">Voucher Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[200, 250, 300, 350, 400, 500].map(pts => (
+                      <tr key={pts} className="border-b border-border/50">
+                        <td className="p-4 font-semibold">{pts} pts</td>
+                        <td className="p-4 text-secondary font-semibold">£{calcVoucherValue(pts).toFixed(2)}</td>
+                      </tr>
                     ))}
-                  </ul>
+                  </tbody>
+                </table>
+                <div className="p-4 text-xs text-muted-foreground bg-muted">
+                  Every additional 50 points adds £0.50 to your voucher value.
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </section>

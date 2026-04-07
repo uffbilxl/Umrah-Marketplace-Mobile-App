@@ -5,6 +5,7 @@ import { useCart } from '@/contexts/CartContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Preloader from '@/components/Preloader';
+import { calcPoints } from '@/lib/points';
 
 const paymentMethods = [
   { id: 'card', icon: 'fa-credit-card', label: 'Credit / Debit Card', desc: 'Visa, Mastercard, Amex' },
@@ -16,7 +17,7 @@ const paymentMethods = [
 
 const CheckoutPage = () => {
   const { items, subtotal, clearCart } = useCart();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [selected, setSelected] = useState('card');
   const [processing, setProcessing] = useState(false);
@@ -26,7 +27,7 @@ const CheckoutPage = () => {
 
   const memberDiscount = user ? items.reduce((s, i) => s + (i.member_discount > 0 ? i.price * i.quantity * (i.member_discount / 100) : 0), 0) : 0;
   const total = subtotal - memberDiscount;
-  const pointsToEarn = Math.floor(total * 10);
+  const pointsToEarn = calcPoints(total);
 
   const handlePay = () => {
     setProcessing(true);
@@ -85,7 +86,6 @@ const CheckoutPage = () => {
           <h1 className="section-title mb-8">Checkout</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Payment methods */}
             <div className="lg:col-span-3 space-y-4">
               <h2 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Select Payment Method</h2>
               {paymentMethods.map(method => (
@@ -135,7 +135,6 @@ const CheckoutPage = () => {
               )}
             </div>
 
-            {/* Order summary */}
             <div className="lg:col-span-2">
               <div className="bg-card rounded-lg p-6 sticky top-24">
                 <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Order Summary</h3>

@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import Preloader from '@/components/Preloader';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { calcVoucherValue, nextVoucherPointsNeeded, redeemCalc } from '@/lib/points';
 
 const STORES = ['Leicester', 'Liverpool', 'Huddersfield', 'Northampton'];
 
@@ -17,30 +18,23 @@ const ProfilePage = () => {
   const initialTab = searchParams.get('tab') || 'details';
   const [tab, setTab] = useState<string>(initialTab);
 
-  // My Details state
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editStore, setEditStore] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Password state
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [changingPass, setChangingPass] = useState(false);
 
-  // Orders state
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
 
-  useEffect(() => {
-    document.title = 'My Profile | Umrah Supermarket';
-  }, []);
+  useEffect(() => { document.title = 'My Profile | Umrah Supermarket'; }, []);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/upoints');
-    }
+    if (!authLoading && !user) navigate('/upoints');
   }, [authLoading, user, navigate]);
 
   useEffect(() => {
@@ -92,21 +86,14 @@ const ProfilePage = () => {
     setNewPass(''); setConfirmPass('');
   };
 
-  const handleRedeem = async (pts: number, val: string) => {
-    if (!profile || profile.points < pts) return;
+  const handleRedeem = async () => {
+    if (!profile || !user) return;
+    const { voucherValue, pointsRemaining } = redeemCalc(profile.points);
+    if (voucherValue <= 0) return;
     const code = 'UMRAH-' + Array.from({ length: 8 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
-    const newPoints = profile.points - pts;
-    const newTier = newPoints >= 5000 ? 'Gold' : newPoints >= 1000 ? 'Silver' : 'Bronze';
-    await supabase.from('profiles').update({ points: newPoints, tier: newTier }).eq('id', user!.id);
+    await supabase.from('profiles').update({ points: pointsRemaining }).eq('id', user.id);
     await refreshProfile();
-    toast.success(`Voucher generated: ${code} — use this at checkout for ${val} off!`);
-  };
-
-  const tierProgress = () => {
-    if (!profile) return { next: 'Silver', needed: 1000, pct: 0, max: 1000 };
-    if (profile.points < 1000) return { next: 'Silver', needed: 1000 - profile.points, pct: (profile.points / 1000) * 100, max: 1000 };
-    if (profile.points < 5000) return { next: 'Gold', needed: 5000 - profile.points, pct: ((profile.points - 1000) / 4000) * 100, max: 5000 };
-    return { next: 'Gold', needed: 0, pct: 100, max: 5000 };
+    toast.success(`Voucher generated: ${code} — use this at checkout for £${voucherValue.toFixed(2)} off!`);
   };
 
   if (authLoading || !profile) {
@@ -121,14 +108,16 @@ const ProfilePage = () => {
     );
   }
 
-  const tp = tierProgress();
+  const voucherValue = calcVoucherValue(profile.points);
+  const ptsToNext = nextVoucherPointsNeeded(profile.points);
+  const progressPct = profile.points >= 200 ? 100 : (profile.points / 200) * 100;
+
   const initials = profile.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   const memberSince = new Date(profile.created_at || '').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
   const inputCls = "w-full px-4 py-3 bg-muted border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-secondary transition-all";
   const tabCls = (t: string) => `px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-all border-b-[3px] ${tab === t ? 'border-secondary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}`;
 
-  // Calculate running points total for points history
   const runningTotals = [...orders].reverse().reduce<{ id: number; running: number }[]>((acc, o) => {
     const prev = acc.length > 0 ? acc[acc.length - 1].running : 0;
     acc.push({ id: o.id, running: prev + o.points_earned });
@@ -149,9 +138,6 @@ const ProfilePage = () => {
             <div className="text-center md:text-left">
               <h1 className="font-header text-2xl md:text-3xl tracking-[0.05em] uppercase text-primary-foreground">{profile.name}</h1>
               <div className="flex items-center gap-3 mt-1 justify-center md:justify-start">
-                <span className={`px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border border-secondary ${profile.tier === 'Gold' ? 'bg-secondary text-secondary-foreground' : 'text-secondary'}`}>
-                  {profile.tier}
-                </span>
                 <span className="text-xs text-primary-foreground/60">Member since {memberSince}</span>
               </div>
             </div>
@@ -186,9 +172,7 @@ const ProfilePage = () => {
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground tracking-[0.1em] uppercase mb-1 block">Email Address</label>
-                      <div className="relative">
-                        <input value={profile.email} readOnly className={`${inputCls} bg-muted/60 cursor-not-allowed`} />
-                      </div>
+                      <input value={profile.email} readOnly className={`${inputCls} bg-muted/60 cursor-not-allowed`} />
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground tracking-[0.1em] uppercase mb-1 block">Phone Number</label>
@@ -205,12 +189,6 @@ const ProfilePage = () => {
                       <label className="text-xs text-muted-foreground tracking-[0.1em] uppercase mb-1 block">Member Since</label>
                       <input value={memberSince} readOnly className={`${inputCls} bg-muted/60 cursor-not-allowed`} />
                     </div>
-                    <div>
-                      <label className="text-xs text-muted-foreground tracking-[0.1em] uppercase mb-1 block">Tier</label>
-                      <div className={`inline-flex px-4 py-3 rounded text-sm font-bold uppercase tracking-wider ${profile.tier === 'Gold' ? 'bg-secondary text-secondary-foreground' : profile.tier === 'Silver' ? 'bg-muted text-foreground' : 'bg-muted text-muted-foreground'}`}>
-                        {profile.tier}
-                      </div>
-                    </div>
                   </div>
                   <div className="flex justify-end mt-6">
                     <button onClick={handleSaveDetails} disabled={saving} className="bg-primary text-primary-foreground px-8 py-3 rounded-[2px] text-sm font-semibold tracking-[0.1em] uppercase hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-2">
@@ -219,7 +197,6 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                {/* Change password */}
                 <div className="bg-card rounded-lg p-6">
                   <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-6">Change Password</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[600px]">
@@ -299,55 +276,43 @@ const ProfilePage = () => {
                   <div className="text-sm text-umrah-black/60 tracking-[0.15em] uppercase font-semibold mb-1">Total Balance</div>
                   <div className="font-header text-5xl text-umrah-black leading-none mb-4">{profile.points.toLocaleString()} pts</div>
                   <div className="w-full h-2 bg-umrah-black/15 rounded-full overflow-hidden mb-2">
-                    <div className="h-full bg-umrah-black rounded-full transition-all" style={{ width: `${Math.min(tp.pct, 100)}%` }} />
+                    <div className="h-full bg-umrah-black rounded-full transition-all" style={{ width: `${Math.min(progressPct, 100)}%` }} />
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-umrah-black/50 font-semibold">{tp.needed > 0 ? `${tp.needed} pts until ${tp.next}` : 'Maximum tier reached!'}</span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${profile.tier === 'Gold' ? 'bg-umrah-black text-secondary' : profile.tier === 'Silver' ? 'bg-umrah-black/20 text-umrah-black' : 'bg-umrah-black/10 text-umrah-black/70'}`}>
-                      {profile.tier}
+                    <span className="text-sm text-umrah-black/50 font-semibold">
+                      {voucherValue > 0
+                        ? `Voucher available: £${voucherValue.toFixed(2)}`
+                        : `${ptsToNext} pts until first voucher`}
                     </span>
                   </div>
                 </div>
 
-                {/* Tier benefits */}
-                <div>
-                  <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Tier Benefits</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[
-                      { name: 'Bronze', range: '0–999 pts', perks: ['Basic member pricing', 'Access to member discounts', 'U Points on every purchase'] },
-                      { name: 'Silver', range: '1,000–4,999 pts', perks: ['Everything in Bronze', '5% extra off all deals', 'Priority deal alerts', 'Double points on birthdays'] },
-                      { name: 'Gold', range: '5,000+ pts', perks: ['Everything in Silver', '10% extra off all deals', 'Exclusive Gold products', 'Free click & collect priority'] },
-                    ].map(t => (
-                      <div key={t.name} className={`bg-card rounded-lg p-5 border ${t.name === profile.tier ? 'border-secondary ring-2 ring-secondary/20' : 'border-border'}`}>
-                        <h4 className="font-header text-base tracking-[0.08em] uppercase mb-1">{t.name}</h4>
-                        <p className="text-xs text-secondary font-semibold mb-3">{t.range}</p>
-                        <ul className="space-y-1.5">
-                          {t.perks.map(p => <li key={p} className="text-xs text-muted-foreground flex items-start gap-1.5"><span className="text-secondary mt-0.5">✓</span>{p}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Redeem rewards */}
+                {/* Redeem */}
                 <div>
                   <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Redeem Your Points</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[{ pts: 500, val: '£5' }, { pts: 1000, val: '£10' }, { pts: 2000, val: '£20' }].map(r => (
-                      <div key={r.pts} className="bg-card border border-border rounded-lg p-5 text-center">
-                        <div className="font-header text-2xl text-secondary mb-1">{r.val}</div>
-                        <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Voucher</div>
-                        <div className="text-sm font-semibold mb-3">{r.pts} pts</div>
-                        <button
-                          onClick={() => handleRedeem(r.pts, r.val)}
-                          disabled={profile.points < r.pts}
-                          className="w-full py-2 rounded-[2px] text-xs font-bold tracking-[0.1em] uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed bg-secondary text-secondary-foreground hover:bg-umrah-gold-dark"
-                        >
-                          Redeem
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                  {voucherValue > 0 ? (
+                    <div className="bg-card border border-border rounded-lg p-6 text-center">
+                      <div className="font-header text-3xl text-secondary mb-1">£{voucherValue.toFixed(2)}</div>
+                      <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Voucher</div>
+                      <div className="text-sm font-semibold mb-4">Based on your {profile.points} pts</div>
+                      <button
+                        onClick={handleRedeem}
+                        className="bg-secondary text-secondary-foreground px-8 py-3 rounded-[2px] text-sm font-bold tracking-[0.1em] uppercase hover:bg-umrah-gold-dark transition-all"
+                      >
+                        Redeem Voucher
+                      </button>
+                      {ptsToNext > 0 && (
+                        <div className="text-xs text-muted-foreground mt-3">
+                          Earn {ptsToNext} more points to increase your voucher by £0.50
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="bg-card border border-border rounded-lg p-6 text-center">
+                      <div className="text-sm text-muted-foreground mb-2">You need at least 200 points to redeem a voucher.</div>
+                      <div className="text-sm text-secondary font-semibold">{ptsToNext} more points to go!</div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Points history */}

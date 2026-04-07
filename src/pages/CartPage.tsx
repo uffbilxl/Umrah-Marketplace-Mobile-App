@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Preloader from '@/components/Preloader';
 import { toast } from 'sonner';
+import { calcPoints } from '@/lib/points';
 
 const CartPage = () => {
   const { items, updateQuantity, removeItem, clearCart, subtotal } = useCart();
@@ -17,7 +18,7 @@ const CartPage = () => {
 
   const memberDiscount = user ? items.reduce((s, i) => s + (i.member_discount > 0 ? i.price * i.quantity * (i.member_discount / 100) : 0), 0) : 0;
   const total = subtotal - memberDiscount;
-  const pointsToEarn = Math.floor(total * 10);
+  const pointsToEarn = calcPoints(total);
 
   const handleCheckout = async () => {
     if (!user || !profile) {
@@ -38,10 +39,8 @@ const CartPage = () => {
       return;
     }
 
-    // Update points
     const newPoints = profile.points + points_earned;
-    const newTier = newPoints >= 5000 ? 'Gold' : newPoints >= 1000 ? 'Silver' : 'Bronze';
-    await supabase.from('profiles').update({ points: newPoints, tier: newTier }).eq('id', user.id);
+    await supabase.from('profiles').update({ points: newPoints }).eq('id', user.id);
     await refreshProfile();
     clearCart();
     toast.success(`Order placed! You earned ${points_earned} pts.`);
@@ -76,7 +75,6 @@ const CartPage = () => {
         <div className="container-umrah">
           <h1 className="section-title mb-8">Your Basket</h1>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Items */}
             <div className="lg:col-span-2 space-y-4">
               {items.map(item => (
                 <div key={item.product_id} className="bg-card rounded-lg p-4 flex gap-4 items-center">
@@ -98,7 +96,6 @@ const CartPage = () => {
               ))}
             </div>
 
-            {/* Summary */}
             <div className="bg-card rounded-lg p-6 h-fit sticky top-24">
               <h3 className="font-header text-sm tracking-[0.1em] uppercase mb-4">Order Summary</h3>
               <div className="space-y-3 text-sm border-b border-border pb-4 mb-4">
