@@ -12,7 +12,7 @@ const Navbar = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
-  const { totalItems } = useCart();
+  const { totalItems, items: cartItems, subtotal: cartSubtotal } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -68,14 +68,44 @@ const Navbar = () => {
             </Link>
             <Link to="/stores" className={navLinkClass}>Stores</Link>
             <Link to="/about" className={navLinkClass}>About</Link>
-            <Link to="/cart" className="relative text-umrah-white hover:text-secondary transition-all">
-              <ShoppingBasket className="w-5 h-5" />
+            <div className="relative group">
+              <Link to="/cart" className="relative text-umrah-white hover:text-secondary transition-all block">
+                <ShoppingBasket className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-secondary text-umrah-black text-[0.6rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+              {/* Basket hover dropdown */}
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-secondary text-umrah-black text-[0.6rem] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  {totalItems}
-                </span>
+                <div className="absolute right-0 top-full mt-2 w-[300px] bg-card rounded-lg shadow-[var(--shadow-lg)] border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div className="p-4">
+                    <h4 className="font-header text-xs tracking-[0.1em] uppercase mb-3">Your Basket ({totalItems})</h4>
+                    <div className="space-y-3 max-h-[220px] overflow-y-auto">
+                      {cartItems.slice(0, 5).map(item => (
+                        <div key={item.product_id} className="flex items-center gap-3">
+                          <img src={item.image_url || '/placeholder.svg'} alt={item.name} className="w-10 h-10 rounded object-cover shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-medium truncate">{item.name}</div>
+                            <div className="text-xs text-muted-foreground">×{item.quantity} · £{(item.price * item.quantity).toFixed(2)}</div>
+                          </div>
+                        </div>
+                      ))}
+                      {cartItems.length > 5 && (
+                        <p className="text-xs text-muted-foreground text-center">+{cartItems.length - 5} more items</p>
+                      )}
+                    </div>
+                    <div className="border-t border-border mt-3 pt-3 flex justify-between items-center">
+                      <span className="font-header text-sm">£{cartSubtotal.toFixed(2)}</span>
+                      <Link to="/cart" className="bg-secondary text-secondary-foreground px-4 py-1.5 rounded-[2px] text-xs font-bold tracking-[0.1em] uppercase hover:bg-umrah-gold-dark transition-all">
+                        View Basket
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               )}
-            </Link>
+            </div>
 
             {user && profile ? (
               <div className="relative" ref={menuRef}>

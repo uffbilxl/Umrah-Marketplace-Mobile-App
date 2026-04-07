@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Preloader from '@/components/Preloader';
+import { toast } from 'sonner';
 
 const CATEGORIES = ['Fresh Halal Meat', 'Frozen Foods', 'Sauces', 'Masalas & Spices', 'Drinks', 'Fresh Produce', 'Bakery'];
 
@@ -144,13 +145,18 @@ const ShopPage = () => {
                             <i className="fas fa-star text-[0.5rem]" /> +{pts} pts
                           </div>
                           <button
-                            onClick={() => addItem({
-                              product_id: product.id,
-                              name: product.name,
-                              price: memberPrice || product.price,
-                              image_url: product.image_url,
-                              member_discount: product.member_discount,
-                            })}
+                            onClick={() => {
+                              addItem({
+                                product_id: product.id,
+                                name: product.name,
+                                price: memberPrice || product.price,
+                                image_url: product.image_url,
+                                member_discount: product.member_discount,
+                              });
+                              toast.success(`${product.name} added to basket`, {
+                                description: `£${(memberPrice || product.price).toFixed(2)} · +${pts} pts`,
+                              });
+                            }}
                             disabled={!product.in_stock}
                             className="w-full bg-primary text-primary-foreground py-2.5 rounded-[2px] text-sm font-semibold tracking-[0.1em] uppercase hover:bg-primary/90 transition-all disabled:opacity-50"
                           >
