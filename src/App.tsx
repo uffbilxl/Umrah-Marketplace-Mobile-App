@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import Preloader from "@/components/Preloader";
 import HomePage from "./pages/HomePage";
 import SearchPage from "./pages/SearchPage";
 import RewardsPage from "./pages/RewardsPage";
@@ -22,6 +23,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Sonner />
+      <Preloader />
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
