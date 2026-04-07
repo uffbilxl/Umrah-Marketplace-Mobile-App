@@ -27,14 +27,21 @@ const UPointsPage = () => {
     document.title = 'U Points Loyalty | Umrah Supermarket';
   }, []);
 
+  const fetchData = async () => {
+    if (!user) return;
+    const [purchaseRes, voucherRes] = await Promise.all([
+      supabase.from('purchases').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+      supabase.from('vouchers').select('*').eq('user_id', user.id).eq('used', false).order('created_at', { ascending: false }),
+    ]);
+    const pData = purchaseRes.data || [];
+    setPurchases(pData);
+    setPurchaseCount(pData.length);
+    setTotalSpent(pData.reduce((s: number, p: any) => s + Number(p.total_spent), 0));
+    setVouchers(voucherRes.data || []);
+  };
+
   useEffect(() => {
-    if (user) {
-      supabase.from('purchases').select('*').eq('user_id', user.id).order('date', { ascending: false }).then(({ data }) => {
-        setPurchases(data || []);
-        setPurchaseCount(data?.length || 0);
-        setTotalSpent(data?.reduce((s: number, p: any) => s + Number(p.total_spent), 0) || 0);
-      });
-    }
+    fetchData();
   }, [user]);
 
   const handleRegister = async (e: React.FormEvent) => {
