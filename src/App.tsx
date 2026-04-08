@@ -47,6 +47,8 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <ChatWidget />
+            </Routes>
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
