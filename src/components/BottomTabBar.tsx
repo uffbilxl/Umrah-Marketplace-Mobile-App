@@ -10,31 +10,29 @@ const tabs = [
 
 const BottomTabBar = () => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
-      <div className="mx-4 mb-3 bg-muted/90 backdrop-blur-xl rounded-full border border-border/50 shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
-        <div className="flex items-center justify-around py-2 px-2">
-          {tabs.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-5 py-2 rounded-full transition-all ${
-                  isActive
-                    ? 'bg-muted text-secondary'
-                    : 'text-muted-foreground'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
-                  <span className="text-[0.6rem] font-semibold tracking-wider">{label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
-        </div>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/50 safe-bottom">
+      <div className="flex items-center justify-around py-2 px-4">
+        {tabs.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-0.5 px-5 py-2 rounded-xl transition-all duration-200 ${
+                isActive
+                  ? 'text-secondary'
+                  : 'text-muted-foreground active:scale-95'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.8} />
+                <span className="text-[0.6rem] font-semibold tracking-wider">{label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
       </div>
     </nav>
   );

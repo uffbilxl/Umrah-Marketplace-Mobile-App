@@ -7,7 +7,7 @@ const MobileHeader = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 px-5 pt-[env(safe-area-inset-top,12px)] pb-3 bg-background/80 backdrop-blur-xl">
+    <header className="fixed top-0 left-0 right-0 z-40 px-5 pt-[env(safe-area-inset-top,8px)] pb-2 bg-background/95 backdrop-blur-xl border-b border-border/30">
       <div className="flex items-center justify-between">
         <Link to="/" className="hover-scale">
           <img
