@@ -14,7 +14,7 @@ const AboutPage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-20 pb-24 min-h-screen bg-background relative overflow-hidden">
+      <main className="mobile-page mobile-scroll-surface bg-background relative">
         <img src={patternLeft} alt="" className="absolute top-40 -left-6 w-14 h-auto opacity-[0.06] pointer-events-none" aria-hidden="true" />
         <img src={patternRight} alt="" className="absolute bottom-60 -right-6 w-14 h-auto opacity-[0.06] pointer-events-none" aria-hidden="true" />
 

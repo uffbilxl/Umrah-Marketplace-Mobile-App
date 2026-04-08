@@ -24,7 +24,7 @@ const CartPage = () => {
     return (
       <>
         <MobileHeader />
-        <main className="pt-20 pb-24 min-h-screen bg-background flex flex-col items-center justify-center px-5">
+        <main className="mobile-page bg-background flex flex-col items-center justify-center px-5">
           <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
             <i className="fas fa-shopping-basket text-secondary text-2xl" />
           </div>
@@ -42,7 +42,7 @@ const CartPage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-20 pb-24 min-h-screen bg-background">
+      <main className="mobile-page mobile-scroll-surface bg-background">
         <div className="px-5">
           <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <ArrowLeft className="w-4 h-4" /> Back

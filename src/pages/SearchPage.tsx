@@ -45,7 +45,7 @@ const SearchPage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-20 pb-24 min-h-screen bg-background">
+      <main className="mobile-page mobile-scroll-surface bg-background">
         <div className="px-5">
           <h1 className="font-header text-2xl tracking-[0.08em] uppercase mb-5">
             Search products
