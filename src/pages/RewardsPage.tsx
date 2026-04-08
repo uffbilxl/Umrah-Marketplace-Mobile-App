@@ -81,8 +81,9 @@ const RewardsPage = () => {
   if (!user || !profile) {
     return (
       <>
-        <main className="pt-6 pb-24 min-h-screen bg-background">
-          <div className="px-5 pt-16">
+        <MobileHeader />
+        <main className="mobile-page mobile-scroll-surface bg-background">
+          <div className="px-5">
             <h1 className="font-header text-2xl tracking-[0.08em] uppercase mb-2 text-center">
               U Points Loyalty
             </h1>
