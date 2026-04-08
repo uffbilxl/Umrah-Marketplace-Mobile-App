@@ -81,7 +81,8 @@ const RewardsPage = () => {
   if (!user || !profile) {
     return (
       <>
-        <main className="pt-6 pb-24 min-h-screen bg-background">
+        <MobileHeader />
+        <main className="mobile-page mobile-scroll-surface bg-background">
           <div className="px-5">
             <h1 className="font-header text-2xl tracking-[0.08em] uppercase mb-2 text-center">
               U Points Loyalty
@@ -156,7 +157,7 @@ const RewardsPage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-20 pb-24 min-h-screen bg-background relative overflow-hidden">
+      <main className="mobile-page mobile-scroll-surface bg-background relative">
         {/* Pattern decoration */}
         <img src={patternLeft} alt="" className="absolute top-28 -left-4 w-10 h-auto opacity-[0.05] pointer-events-none" aria-hidden="true" />
 

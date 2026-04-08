@@ -51,7 +51,7 @@ const DealsPage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-20 pb-24 min-h-screen bg-background">
+      <main className="mobile-page mobile-scroll-surface bg-background">
         <div className="px-5">
           <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <ArrowLeft className="w-4 h-4" /> Back

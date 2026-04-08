@@ -3,7 +3,7 @@ const DecorativeStrip = ({ position }: { position: 'top' | 'bottom' }) => {
 
   return (
     <div
-      className={`fixed ${isTop ? 'top-0' : 'bottom-0'} left-0 right-0 z-30 pointer-events-none overflow-hidden`}
+      className={`fixed ${isTop ? 'top-0' : 'bottom-0'} left-0 right-0 z-30 pointer-events-none overflow-hidden hidden`}
       style={{ height: '6px' }}
       aria-hidden="true"
     >

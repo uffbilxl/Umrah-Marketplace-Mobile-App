@@ -225,4 +225,11 @@ html, body {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
+
+  .hover-scale {
+    transition: transform 0.2s ease;
+  }
+  .hover-scale:active {
+    transform: scale(0.97);
+  }
 }
