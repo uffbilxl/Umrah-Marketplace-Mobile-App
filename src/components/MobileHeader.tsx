@@ -7,18 +7,18 @@ const MobileHeader = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="ios-fixed-surface fixed top-0 left-0 right-0 z-40 px-5 pt-[env(safe-area-inset-top,8px)] pb-2 bg-background/95 backdrop-blur-xl border-b border-border/30">
-      <div className="flex items-center justify-between">
+    <header className="ios-fixed-surface safe-top fixed inset-x-0 top-0 z-40 border-b border-border/30 bg-background/95 backdrop-blur-xl">
+      <div className="mobile-header-frame flex items-center justify-between px-5 py-2">
         <Link to="/" className="hover-scale">
           <img
             src="/images/umrah_logo.png"
             alt="Umrah Supermarket"
-            className="h-12 w-auto object-contain"
+            className="h-11 w-auto object-contain"
           />
         </Link>
         <button
           onClick={() => navigate('/cart')}
-          className="relative w-11 h-11 bg-secondary rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-200"
+          className="relative flex h-11 w-11 items-center justify-center rounded-full bg-secondary transition-transform duration-200 hover:scale-110"
         >
           <ShoppingCart className="w-5 h-5 text-secondary-foreground" />
           {totalItems > 0 && (
