@@ -11,19 +11,6 @@ const tabs = [
 const BottomTabBar = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
-      {/* Decorative pattern strip on top */}
-      <div className="h-[4px] w-full overflow-hidden">
-        <svg width="100%" height="4" preserveAspectRatio="none" viewBox="0 0 400 4">
-          <rect width="400" height="4" fill="hsl(43, 89%, 58%)" />
-          {Array.from({ length: 25 }).map((_, i) => (
-            <polygon
-              key={i}
-              points={`${i * 16},4 ${i * 16 + 8},0 ${i * 16 + 16},4`}
-              fill="hsl(150, 52%, 21%)"
-            />
-          ))}
-        </svg>
-      </div>
       <div className="bg-background/95 backdrop-blur-xl">
         <div className="flex items-center justify-around py-2 px-4">
           {tabs.map(({ to, icon: Icon, label }) => (
@@ -48,6 +35,19 @@ const BottomTabBar = () => {
             </NavLink>
           ))}
         </div>
+      </div>
+      {/* Decorative pattern strip at bottom */}
+      <div className="h-[4px] w-full overflow-hidden">
+        <svg width="100%" height="4" preserveAspectRatio="none" viewBox="0 0 400 4">
+          <rect width="400" height="4" fill="hsl(43, 89%, 58%)" />
+          {Array.from({ length: 25 }).map((_, i) => (
+            <polygon
+              key={i}
+              points={`${i * 16},0 ${i * 16 + 8},4 ${i * 16 + 16},0`}
+              fill="hsl(150, 52%, 21%)"
+            />
+          ))}
+        </svg>
       </div>
     </nav>
   );
