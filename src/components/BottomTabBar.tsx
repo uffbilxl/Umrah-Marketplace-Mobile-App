@@ -10,8 +10,8 @@ const tabs = [
 
 const BottomTabBar = () => {
   return (
-    <nav className="ios-fixed-surface fixed inset-x-0 bottom-0 z-50 border-t border-border/30 bg-background/95 backdrop-blur-xl">
-      <div className="mobile-dock-frame safe-bottom flex items-center justify-around px-4 pt-2 pb-1">
+    <nav className="ios-fixed-surface fixed inset-x-0 bottom-0 z-50 bg-background border-t border-border/30">
+      <div className="flex items-center justify-around px-4 pt-2 pb-1">
         {tabs.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -46,6 +46,8 @@ const BottomTabBar = () => {
           ))}
         </svg>
       </div>
+      {/* Safe area spacer — fills the home-indicator region so the dock sits flush */}
+      <div className="bg-background" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
     </nav>
   );
 };
