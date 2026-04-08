@@ -35,6 +35,8 @@
     --ring: 150 52% 21%;
 
     --radius: 0.75rem;
+    --mobile-header-height: 4.5rem;
+    --mobile-dock-height: 4.5rem;
 
     /* Custom brand tokens */
     --umrah-green: 150 52% 21%;
@@ -201,8 +203,8 @@ html, body {
 @layer utilities {
   .mobile-page {
     min-height: 100dvh;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 5.25rem);
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.75rem);
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--mobile-header-height));
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--mobile-dock-height) + 4px);
   }
 
   .mobile-scroll-surface {
@@ -210,8 +212,17 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
 
+  .mobile-header-frame {
+    min-height: var(--mobile-header-height);
+  }
+
+  .mobile-dock-frame {
+    min-height: var(--mobile-dock-height);
+  }
+
   .ios-fixed-surface {
-    transform: translateZ(0);
+    transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 }
