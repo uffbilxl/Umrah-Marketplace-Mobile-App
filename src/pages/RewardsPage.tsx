@@ -84,7 +84,7 @@ const RewardsPage = () => {
         <MobileHeader />
         <main className="mobile-page mobile-scroll-surface bg-background">
           <div className="px-5">
-            <h1 className="font-header text-2xl tracking-[0.08em] uppercase mb-2 text-center pt-2">
+            <h1 className="font-header text-2xl tracking-[0.08em] uppercase mb-2 text-center">
               U Points Loyalty
             </h1>
             <p className="text-sm text-muted-foreground text-center mb-8">
