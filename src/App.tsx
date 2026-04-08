@@ -18,6 +18,7 @@ import DealsPage from "./pages/DealsPage";
 import StoresPage from "./pages/StoresPage";
 import AboutPage from "./pages/AboutPage";
 import NotFound from "./pages/NotFound";
+import ChatWidget from "./components/ChatWidget";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <ChatWidget />
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
