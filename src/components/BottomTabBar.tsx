@@ -10,7 +10,7 @@ const tabs = [
 
 const BottomTabBar = () => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
+    <nav className="ios-fixed-surface fixed bottom-0 left-0 right-0 z-50 safe-bottom">
       <div className="bg-background/95 backdrop-blur-xl">
         <div className="flex items-center justify-around py-2 px-4">
           {tabs.map(({ to, icon: Icon, label }) => (

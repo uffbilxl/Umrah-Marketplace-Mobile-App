@@ -62,7 +62,7 @@ const HomePage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-24 pb-24 min-h-screen bg-background relative overflow-hidden">
+      <main className="mobile-page mobile-scroll-surface bg-background relative">
         {/* Decorative patterns */}
         <img src={patternLeft} alt="" className="absolute top-20 -left-6 w-14 h-auto opacity-[0.06] pointer-events-none" aria-hidden="true" />
         <img src={patternRight} alt="" className="absolute bottom-32 -right-6 w-14 h-auto opacity-[0.06] pointer-events-none" aria-hidden="true" />

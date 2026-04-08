@@ -79,7 +79,7 @@ const ProfilePage = () => {
     return (
       <>
         <MobileHeader />
-        <main className="min-h-screen bg-background flex items-center justify-center">
+        <main className="mobile-page bg-background flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-secondary" />
         </main>
         <BottomTabBar />
@@ -91,7 +91,7 @@ const ProfilePage = () => {
     return (
       <>
         <MobileHeader />
-        <main className="pt-20 pb-24 min-h-screen bg-background flex flex-col items-center justify-center px-5">
+        <main className="mobile-page bg-background flex flex-col items-center justify-center px-5">
           <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
             <User className="w-8 h-8 text-secondary" />
           </div>
@@ -124,7 +124,7 @@ const ProfilePage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-20 pb-24 min-h-screen bg-background relative overflow-hidden">
+      <main className="mobile-page mobile-scroll-surface bg-background relative">
         <img src={patternRight} alt="" className="absolute bottom-40 -right-4 w-10 h-auto opacity-[0.05] pointer-events-none" aria-hidden="true" />
 
         <div className="px-5">

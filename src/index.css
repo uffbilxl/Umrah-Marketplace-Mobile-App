@@ -197,3 +197,21 @@ html, body {
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
+
+@layer utilities {
+  .mobile-page {
+    min-height: 100dvh;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 5.25rem);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.75rem);
+  }
+
+  .mobile-scroll-surface {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ios-fixed-surface {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
