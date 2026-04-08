@@ -62,7 +62,7 @@ const HomePage = () => {
   return (
     <>
       <MobileHeader />
-      <main className="pt-20 pb-24 min-h-screen bg-background relative overflow-hidden">
+      <main className="pt-24 pb-24 min-h-screen bg-background relative overflow-hidden">
         {/* Decorative patterns */}
         <img src={patternLeft} alt="" className="absolute top-20 -left-6 w-14 h-auto opacity-[0.06] pointer-events-none" aria-hidden="true" />
         <img src={patternRight} alt="" className="absolute bottom-32 -right-6 w-14 h-auto opacity-[0.06] pointer-events-none" aria-hidden="true" />
@@ -237,12 +237,14 @@ const HomePage = () => {
 
           {/* Halal Certified Banner */}
           <div className="bg-card rounded-2xl p-5 mb-8 flex items-center gap-4">
-            <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">🏅</span>
+            <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 border-2 border-primary">
+              <svg className="w-7 h-7 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
             </div>
             <div>
               <h3 className="font-header text-xs tracking-[0.1em] uppercase text-foreground mb-0.5">
-                100% Halal Certified
+                HMC Halal Certified
               </h3>
               <p className="text-[0.65rem] text-muted-foreground leading-relaxed">
                 Every meat product meets the highest UK Halal certification standards.
