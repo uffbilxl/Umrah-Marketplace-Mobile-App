@@ -4,7 +4,7 @@ const SidePatternStrip = ({ side }: { side: 'left' | 'right' }) => {
   return (
     <div
       className={`fixed ${isLeft ? 'left-0' : 'right-0'} top-0 bottom-0 z-[35] pointer-events-none`}
-      style={{ width: '8px' }}
+      style={{ width: '8px', display: 'none' }}
       aria-hidden="true"
     >
       <svg
